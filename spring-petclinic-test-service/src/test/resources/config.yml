@@ -1,0 +1,13 @@
+host: ${global.host}
+remote.browser.host: ${browser.host:localhost}
+remote.browser.port: ${browser.port:4444}
+config-server.host: ${config.server.hostname:${global.host:config-server}}
+config-server.port: ${config.server.port:7771}
+discovery-server.host: ${discovery.server.host:${global.host:discovery-server}}
+discovery-server.port: ${discovery.server.port:7772}
+admin-server.host: ${admin.server.host:${global.host:admin-server}}
+admin-server.port: ${admin.server.port:7776}
+gateway-server.host: ${gateway.host:${global.host:api-gateway}}
+gateway-server.port: ${gateway.port:7778}
+customer-service.host: ${customer.service.host:${global.host:customers-service}}
+customer-service.port: ${customer.service.port:7773}

@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  config-server:
+    image: alsaghir/spring-petclinic-config-server
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        - SERVICE_NAME=spring-petclinic-config-server
+    container_name: config-server
+    ports:
+     - "8881:7771"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://config-server:8881/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  discovery-server:
+    image: alsaghir/spring-petclinic-discovery-server
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        - SERVICE_NAME=spring-petclinic-discovery-server
+    container_name: discovery-server
+    ports:
+      - "8882:7772"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    depends_on:
+      config-server:
+        condition: service_healthy

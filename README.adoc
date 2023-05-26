@@ -1,0 +1,181 @@
+= Spring Pet Clinic Micro Services
+:doctype: book
+:idprefix:
+:idseparator: -
+:toc: left
+:toclevels: 4
+:tabsize: 4
+:numbered:
+:sectanchors:
+:sectnums:
+:hide-uri-scheme:
+:docinfo: shared,private
+:attribute-missing: warn
+
+[[intro]]
+== Intro
+
+This is distributed version of the Spring Pet Clinic Sample app built with Spring & Flutter Web. These microservices fork initially inspired by [`spring-petclinic-microservices`](https://github.com/spring-petclinic/spring-petclinic-microservices) to demonstrate how to split sample Spring application into microservices. Multiple technologies are considered for this demonstration which are
+
+* Java 17 & Maven with 3rd party libraries (Lombok, Mapstruct, JOOQ, Flyway, Micrometer)
+* Spring Boot (Web, Data JPA, Admin Server)
+* Spring Cloud (Config, Eureka Discovery, Gateway)
+* Docker
+* Promtail
+* Prometheus
+* Loki
+* Grafana
+* Flutter Web
+* H2 SQL Database
+
+== Status & Progress
+
+As this is still work in progress, there are multiple stages to be done for a complete demonstration.
+
+* Implementation
+  * Add custom labels and tags to prometheus and loki usage
+  * Data initialization for vets and visits services
+  * Complete front-end implementation
+  * Include chaos (not final)
+  * Unit tests
+* Documentation and architecture showcase
+  * Architecture doc
+  * Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)
+  * Commands for starting services locally using docker desktop with docker being target platform
+  * Commands for starting services locally using docker-compose
+* All services to be up and running locally with default configuration
+  * [line-through]#Make sure JOOQ generation of classes done automatically# * done
+  * [line-through]#Generate external config for Observability and tracing for plug & play# * done
+  * Validate functionality of Grafana
+  * Custom Labels in Grafana for prometheus and loki
+* [line-through]#Create separate module for testing all the up and running service automating that everything is up and running as expected# * done
+* [line-through]#All services to be up and running locally# * done
+* All services to be up and running using docker with and without local SDK
+* All services to be up and running using docker compose
+
+== Start services locally
+
+=== Prerequisites
+
+* JDK 17
+* Maven 3.9.x
+* Flutter SDK >= 3.10.5
+* Docker >= 24.0.2
+
+=== Info
+
+* Run the following to start database and observability services.(Note: In Windows PowerShell replace `$(PWD)` with `$+{PWD}+`)
+
+[source,bash]
+----
+# Create network for our usage
+docker network create -d bridge MyBridgeNetwork
+
+# Run H2 Database
+docker container run -d --name h2-server --network=MyBridgeNetwork -d -p 9092:1521 -p 81:81 --mount 'type=volume,src=h2-data,dst=/opt/h2-data' -e H2_OPTIONS=-ifNotExists oscarfonts/h2
+
+# Run tracing and monitoring servers
+docker container run -d --name zipkin-server --network MyBridgeNetwork -p 9411:9411 openzipkin/zipkin
+docker container run -d --name promtail-server --network MyBridgeNetwork -v  $(PWD)/docker/promtail/promtail-config.yaml:/mnt/config/promtail-config.yaml -v  $(PWD)/spring-petclinic-api-gateway/log:/var/log/services/spring-petclinic-api-gateway -v  $(PWD)/spring-petclinic-customer-service/log:/var/log/services/spring-petclinic-customer-service grafana/promtail:2.8.0 --config.file=/mnt/config/promtail-config.yaml
+docker container run -d --name loki-server --network MyBridgeNetwork -v  $(PWD)/docker/loki/loki-config.yaml:/mnt/config/loki-config.yaml -p 3100:3100 grafana/loki:2.8.0 --config.file=/mnt/config/loki-config.yaml
+docker container run -d --name prometheus-server --network MyBridgeNetwork -p 9090:9090 -v  $(PWD)/docker/prometheus/:/etc/prometheus/ prom/prometheus
+docker container run -d --name=grafana-server --network MyBridgeNetwork -p 3000:3000 -v  $(PWD)/docker/grafana/provisioning:/etc/grafana/provisioning -v  $(PWD)/docker/grafana/grafana.ini:/etc/grafana/grafana.ini -v  $(PWD)/docker/grafana/dashboards:/var/lib/grafana/dashboards grafana/grafana-oss
+
+# Run Spring boot apps
+mvn -pl spring-petclinic-config-server clean spring-boot:run -"Dspring-boot.run.profiles=native" -"Dspring-boot.run.arguments=--config.file-repo=D:/Code/spring-petclinic-ms-config/"
+mvn -pl spring-petclinic-discovery-server clean spring-boot:run
+mvn -pl spring-petclinic-admin-server clean spring-boot:run
+mvn -pl spring-petclinic-api-gateway clean spring-boot:run
+mvn -pl spring-petclinic-customer-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2"
+
+# Validate everything is working correctly by running
+# the test service and open spring-petclinic-test-service/target/site/index.html
+# in a browser
+mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE
+----
+
+* Services locations
+
+.Services Locations
+[options="header,footer"]
+|===
+| Service | Endpoint
+| Discovery Server  | http://localhost:7772
+| Config Server  | http://localhost:7771
+| Flutter Web UI & API Gateway  | http://localhost:7778
+| Customers | http://localhost:7773
+| Vets | http://localhost:7774
+| Visits | http://localhost:7775
+| Tracing Server (Zipkin) | http://localhost:9411/zipkin/ (we use openzipkin)
+| Admin Server (Spring Boot Admin) | http://localhost:7776
+| Grafana Dashboards  | http://localhost:3000
+| Prometheus | http://localhost:9090
+| Loki | http://localhost:3100/metrics
+|===
+
+== Start services using docker
+
+=== Prerequisites
+
+* Docker >= 24.0.2
+
+=== Info
+
+* Run the following to start database and observability services.(Note: In windows PowerShell replace `$(PWD)` with `$+{PWD}+`)
+
+[source,bash]
+----
+# Create network for our usage
+docker network create --ipv6=false -d bridge MyBridgeNetwork
+
+# Run H2 Database
+docker container run -d --name h2-server --network=MyBridgeNetwork -d -p 9092:1521 -p 81:81 --mount 'type=volume,src=h2-data,dst=/opt/h2-data' -e H2_OPTIONS=-ifNotExists oscarfonts/h2
+
+# Run tracing and monitoring servers
+docker container run -d --name zipkin-server --network MyBridgeNetwork -p 9411:9411 openzipkin/zipkin
+docker container run -d --name promtail-server --network MyBridgeNetwork -v $(PWD)/docker/promtail/promtail-config.yaml:/mnt/config/promtail-config.yaml -v logVolume:/var/log/services grafana/promtail:2.8.0 --config.file=/mnt/config/promtail-config.yaml
+docker container run -d --name loki-server --network MyBridgeNetwork -v  $(PWD)/docker/loki/loki-config.yaml:/mnt/config/loki-config.yaml -p 3100:3100 grafana/loki:2.8.0 --config.file=/mnt/config/loki-config.yaml
+docker container run -d --name prometheus-server --network MyBridgeNetwork -p 9090:9090 -v  $(PWD)/docker/prometheus/:/etc/prometheus/ prom/prometheus
+docker container run -d --name=grafana-server --network MyBridgeNetwork -p 3000:3000 -v  $(PWD)/docker/grafana/provisioning:/etc/grafana/provisioning -v  $(PWD)/docker/grafana/grafana.ini:/etc/grafana/grafana.ini -v  $(PWD)/docker/grafana/dashboards:/var/lib/grafana/dashboards grafana/grafana-oss
+
+# Build Spring boot apps
+docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-config-server --build-arg SERVICE_NAME=spring-petclinic-config-server .
+docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-discovery-server --build-arg SERVICE_NAME=spring-petclinic-discovery-server .
+docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-admin-server --build-arg SERVICE_NAME=spring-petclinic-admin-server .
+docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-customer-service --build-arg SERVICE_NAME=spring-petclinic-customer-service .
+docker buildx build --progress=plain -f ./docker/flutter-api-gateway/Dockerfile -t spring-petclinic-api-gateway --build-arg SERVICE_NAME=spring-petclinic-api-gateway .
+
+# Manipulate some runtime configurations
+# Give permission to volume for correct user to write to logs files
+docker container run --rm -v logVolume:/var/log/services busybox /bin/sh -c 'touch .initialized && chown -R 10000:10001 /var/log/services'
+
+# Run Spring boot apps
+docker container run -d --name=config-server --network MyBridgeNetwork -p 7771:7771 -v logVolume:/workspace/app/log spring-petclinic-config-server
+docker container run -d --name=discovery-server --network MyBridgeNetwork -p 7772:7772 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ spring-petclinic-discovery-server
+docker container run -d --name=admin-server --network MyBridgeNetwork -p 7776:7776 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server spring-petclinic-admin-server
+docker container run -d --name=customers-service --network MyBridgeNetwork -p 7773:7773 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env H2HOST=h2-server --env H2PORT=1521 --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env SPRING_PROFILES_ACTIVE=default,h2 spring-petclinic-customer-service
+docker container run -d --name=api-gateway --network MyBridgeNetwork -p 7778:7778 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env BACKEND_HOST=http://localhost:7778 spring-petclinic-api-gateway
+
+# Validate everything is working correctly by running
+# the test service and open spring-petclinic-test-service/target/site/index.html
+# in a browser
+docker run --name=firefox -d --network MyBridgeNetwork -p 4444:4444 -p 7900:7900 --shm-size="2g" selenium/standalone-firefox:latest
+docker container run --name=test --network MyBridgeNetwork --rm -v $(PWD):/opt/app -v m2:/root/.m2 -e BROWSER_HOST=firefox maven:3-eclipse-temurin-17-alpine /bin/sh -c 'cd /opt/app && mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE'
+----
+
+.Services Locations
+[options="header,footer"]
+|===
+| Service | Endpoint
+| Discovery Server  | http://localhost:7772
+| Config Server  | http://localhost:7771
+| Flutter Web UI & API Gateway  | http://localhost:7778
+| Customers | http://localhost:7773
+| Vets | http://localhost:7774
+| Visits | http://localhost:7775
+| Tracing Server (Zipkin) | http://localhost:9411/zipkin/ (we use openzipkin)
+| Admin Server (Spring Boot Admin) | http://localhost:7776
+| Grafana Dashboards  | http://localhost:3000
+| Prometheus | http://localhost:9090
+| Loki | http://localhost:3100/metrics
+|===

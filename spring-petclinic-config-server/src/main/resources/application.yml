@@ -1,0 +1,34 @@
+server:
+  port: 7771
+
+  # The stop processing uses a timeout which provides a grace period during which existing requests will be allowed to complete but no new requests will be permitted
+  shutdown: graceful
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      # Allow the microservices to override the remote properties with their own System properties or config file
+      allow-override: true
+      # Override configuration with any local property source
+      override-none: true
+      server:
+        git:
+          uri: ${config.git-repo:https://github.com/alsaghir/spring-petclinic-ms-config}
+          default-label: main
+        # Use the File System Backend to avoid git pulling. Enable "native" profile in the Config Server.
+        native:
+          searchLocations: file:///${config.file-repo}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+
+# Metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
