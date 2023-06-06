@@ -1,0 +1,2 @@
+owners_host: 'http://localhost:7778'
+owners_api: '/api/customer/owners'

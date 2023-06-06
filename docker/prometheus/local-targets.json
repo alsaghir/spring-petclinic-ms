@@ -1,0 +1,38 @@
+[
+  {
+    "labels": {
+      "job": "api-gateway",
+      "instance" : "api-gateway"
+    },
+    "targets": [
+      "host.docker.internal:7778"
+    ]
+  },
+  {
+    "labels": {
+      "job": "customers-service",
+      "instance" : "customers-service"
+    },
+    "targets": [
+      "host.docker.internal:7773"
+    ]
+  },
+  {
+    "labels": {
+      "job": "visits-service",
+      "instance" : "visits-service"
+    },
+    "targets": [
+      "host.docker.internal:7775"
+    ]
+  },
+  {
+    "labels": {
+      "job": "vets-service",
+      "instance" : "vets-service"
+    },
+    "targets": [
+      "host.docker.internal:7774"
+    ]
+  }
+]
