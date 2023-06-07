@@ -5,21 +5,3 @@ spring:
     import: configserver:${config-server-url:http://localhost:7771/}
   cache:
     cache-names: vets
-
----
-spring:
-  config:
-    activate:
-      on-profile: h2-jooq-generator
-  jpa:
-    generate-ddl: false
-    hibernate:
-      ddl-auto: validate
-  datasource:
-    url: @db.url@
-    username: @db.username@
-    password: @db.password@
-    driver-class-name: @db.driver@
-  sql:
-    init:
-      mode: never
