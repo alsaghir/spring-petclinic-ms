@@ -32,7 +32,7 @@ public class Specialty {
             valueColumnName = "SEQ_VALUE",
             initialValue = 1,
             allocationSize = 1)
-    private Integer id;
+    private Long id;
 
     private String name;
 

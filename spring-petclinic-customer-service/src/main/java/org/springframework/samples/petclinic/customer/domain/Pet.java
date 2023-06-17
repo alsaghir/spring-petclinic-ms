@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.core.style.ToStringCreator;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -40,7 +39,7 @@ public class Pet {
             valueColumnName = "SEQ_VALUE",
             initialValue = 1,
             allocationSize = 1)
-    private Integer id;
+    private Long id;
 
     private String name;
     @Temporal(TemporalType.DATE)

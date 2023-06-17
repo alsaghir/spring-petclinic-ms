@@ -20,7 +20,6 @@ import org.springframework.core.style.ToStringCreator;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -43,7 +42,7 @@ public class Owner {
             valueColumnName = "SEQ_VALUE",
             initialValue = 1,
             allocationSize = 1)
-    private Integer id;
+    private Long id;
 
     @NotBlank
     private String firstName;

@@ -9,7 +9,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.TableGenerator;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,7 +38,7 @@ public class Visit {
             valueColumnName = "SEQ_VALUE",
             initialValue = 1,
             allocationSize = 1)
-    private Integer id;
+    private Long id;
 
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")

@@ -19,6 +19,7 @@ This is distributed version of the Spring Pet Clinic Sample app built with Sprin
 As this is still work in progress, there are multiple stages to be done for a complete demonstration.
 
 - Implementation
+  - Add custom labels and tags to prometheus and loki usage
   - Data initialization for vets and visits services
   - Complete front-end implementation
   - Include chaos (not final)

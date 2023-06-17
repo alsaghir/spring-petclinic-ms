@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.6</version>
+        <version>3.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -30,7 +30,7 @@
         <java.version>17</java.version>
         <parent.version>${project.version}</parent.version>
 
-        <spring-cloud.version>2022.0.2</spring-cloud.version>
+        <spring-cloud.version>2022.0.3</spring-cloud.version>
 
         <jooq.version>3.17.8</jooq.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
@@ -38,7 +38,7 @@
         <jackson-databind-nullabl.version>0.2.6</jackson-databind-nullabl.version>
         <problem-spring-web-starter.version>0.27.0</problem-spring-web-starter.version>
         <flyway-maven-plugin.version>9.16.1</flyway-maven-plugin.version>
-        <spring-boot-admin.version>3.0.2</spring-boot-admin.version>
+        <spring-boot-admin.version>3.0.4</spring-boot-admin.version>
         <micrometer.version>1.10.6</micrometer.version>
         <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
     </properties>
