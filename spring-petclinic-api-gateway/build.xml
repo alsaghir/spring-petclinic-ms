@@ -13,7 +13,7 @@
               executable="powershell.exe"
               resultproperty="serialNumber"
               failonerror="true">
-            <arg line="-Command flutter build web"/>
+            <arg line="-Command flutter build web --web-renderer html"/>
         </exec>
         <echo level="info" message="Flutter app build is successful"/>
     </target>
