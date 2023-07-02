@@ -1,5 +1,4 @@
-<project name="petclinic_ui" basedir="." xmlns:if="ant:if"
-         xmlns:unless="ant:unless">
+<project name="petclinic_ui" basedir="." xmlns:if="ant:if">
 
     <property name="src.location" location="src/main/dart"/>
     <property name="target.location" location="src/main/resources/static"/>
