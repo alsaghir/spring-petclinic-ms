@@ -2,7 +2,7 @@ package org.springframework.samples.petclinic.customer.application.command;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 

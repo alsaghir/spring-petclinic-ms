@@ -1,4 +1,5 @@
-<project name="petclinic_ui" basedir=".">
+<project name="petclinic_ui" basedir="." xmlns:if="ant:if"
+         xmlns:unless="ant:unless">
 
     <property name="src.location" location="src/main/dart"/>
     <property name="target.location" location="src/main/resources/static"/>
@@ -8,12 +9,26 @@
         <os family="windows"/>
     </condition>
 
-    <target name="compile-flutter" if="isWindows">
-        <exec dir="${src.location}"
+    <condition property="isUnix" value="true">
+        <os family="unix"/>
+    </condition>
+
+    <target name="compile-flutter">
+        <exec if:true="${isWindows}"
+              dir="${src.location}"
               executable="powershell.exe"
               resultproperty="serialNumber"
               failonerror="true">
             <arg line="-Command flutter build web --web-renderer html"/>
+        </exec>
+
+        <exec if:true="${isUnix}"
+              dir="${src.location}"
+              executable="/bin/sh"
+              resultproperty="serialNumber"
+              failonerror="true">
+            <arg line="-c"/>
+            <arg line="'flutter build web --web-renderer html'"/>
         </exec>
         <echo level="info" message="Flutter app build is successful"/>
     </target>

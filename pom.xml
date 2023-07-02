@@ -21,6 +21,8 @@
         <module>spring-petclinic-config-server</module>
         <module>spring-petclinic-discovery-server</module>
 
+        <module>spring-petclinic-test-service</module>
+
         <module>spring-petclinic-customer-service</module>
         <module>spring-petclinic-vets-service</module>
         <module>spring-petclinic-visits-service</module>
@@ -30,7 +32,7 @@
         <java.version>17</java.version>
         <parent.version>${project.version}</parent.version>
 
-        <spring-cloud.version>2022.0.3</spring-cloud.version>
+        <spring-cloud.version>2022.0.2</spring-cloud.version>
 
         <jooq.version>3.17.8</jooq.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
@@ -42,6 +44,7 @@
         <micrometer.version>1.11.1</micrometer.version>
         <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
         <selenium-java.version>4.10.0</selenium-java.version>
+        <maven-surefire-report-plugin.version>3.1.2</maven-surefire-report-plugin.version>
     </properties>
 
     <build>

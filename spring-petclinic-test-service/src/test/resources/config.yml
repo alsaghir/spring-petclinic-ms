@@ -1,0 +1,6 @@
+host: ${BROWSER_HOST:localhost}
+config.server.port: ${CONFIG_SERVER_PORT:7771}
+discovery.server.port: ${DISCOVERY_SERVER_PORT:7772}
+admin.server.port: ${DISCOVERY_SERVER_PORT:7776}
+gateway.port: ${GATEWAY_PORT:7778}
+customer.service.port: ${CUSTOMER_SERVICE_PORT:7778}

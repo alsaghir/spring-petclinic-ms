@@ -2,9 +2,10 @@
 
 ## Intro
 
-This is distributed version of the Spring Pet Clinic Sample app built with Spring & Flutter Web. This microservices fork initially inspired by [`spring-petclinic-microservices`](https://github.com/spring-petclinic/spring-petclinic-microservices) to demonstrate how to split sample Spring application into microservices. Multiple technologies are considered for this demonstration which are
+This is distributed version of the Spring Pet Clinic Sample app built with Spring & Flutter Web. These microservices fork initially inspired by [`spring-petclinic-microservices`](https://github.com/spring-petclinic/spring-petclinic-microservices) to demonstrate how to split sample Spring application into microservices. Multiple technologies are considered for this demonstration which are
 
-- Spring Boot (Web, Data JPA, JOOQ, Flyway, Lombok, Mapstruct, Micrometer, Admin Server)
+- Java 17 & Maven with 3rd party libraries (Lombok, Mapstruct, JOOQ, Flyway, Micrometer)
+- Spring Boot (Web, Data JPA, Admin Server)
 - Spring Cloud (Config, Eureka Discovery, Gateway)
 - Docker
 - Promtail
@@ -30,20 +31,30 @@ As this is still work in progress, there are multiple stages to be done for a co
   - Commands for starting services locally using docker desktop with docker being target platform
   - Commands for starting services locally using docker-compose
 - All services to be up and running locally with default configuration
-  - Make sure JOOQ generation of classes done automatically
+  - ~~Make sure JOOQ generation of classes done automatically~~ - done
   - Generate external config for Observability and tracing for plug & play
   - Validate functionality of Grafana
   - Custom Labels in Grafana for prometheus and loki
-- Create separate module for testing all the up and running service automating that everything is up and running as expected
-- All services to be up and running using docker
+- ~~Create separate module for testing all the up and running service automating that everything is up and running as expected~~ - donw
+- All services to be up and running locally
+- All services to be up and running using docker with and without local SDK
 - All services to be up and running using docker compose
 
 ## Start services locally
 
+### Prerequisites
+
+- JDK 17
+- Maven 3.9.x
+- Flutter SDK >= 3.10.5
+- Docker >= 24.0.2
+
+### Start services locally
+
 - Run the following to start database and observability services
 
 ```sh
-# Create netowork for our usage
+# Create network for our usage
 docker network create -d bridge MyBridgeNetwork
 
 # Run H2 Database
@@ -62,6 +73,11 @@ mvn -pl spring-petclinic-discovery-server clean spring-boot:run
 mvn -pl spring-petclinic-admin-server clean spring-boot:run
 mvn -pl spring-petclinic-api-gateway clean spring-boot:run
 mvn -pl spring-petclinic-customer-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2"
+
+# Validate everything is working correctly bu running
+# the test service and open spring-petclinic-test-service/target/site/index.html
+# in a browser
+mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE
 ```
 
 - Services locations
@@ -76,3 +92,9 @@ mvn -pl spring-petclinic-customer-service clean spring-boot:run -"Dspring-boot.r
   - Grafana Dashboards - http://localhost:3000
   - Prometheus - http://localhost:9090
   - Loki - http://localhost:3100/metrics
+
+## Start services using docker
+
+### Prerequisites
+
+- Docker >= 24.0.2
