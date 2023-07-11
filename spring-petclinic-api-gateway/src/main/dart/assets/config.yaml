@@ -1,2 +1,2 @@
-owners_host: 'http://localhost:7778'
-owners_api: '/api/customer/owners'
+backend.host: '${BACKEND_HOST:http://localhost:7778}'
+api.owners: '/api/customer/owners'

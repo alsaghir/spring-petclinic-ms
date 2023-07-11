@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:yaml/yaml.dart';
 
 class Config {
-  static late String kOwnersHost;
+  static late String kBackendHost;
   static late String kOwnersApi;
   static final Completer<bool> isLoaded = Completer<bool>();
 
   static String ownersEndpoint() {
-    return kOwnersHost + kOwnersApi;
+    print(kBackendHost + kOwnersApi);
+    return kBackendHost + kOwnersApi;
   }
 
   static loadAssets(BuildContext context) async {
@@ -17,8 +18,10 @@ class Config {
       final yamlString =
           await DefaultAssetBundle.of(context).loadString('assets/config.yaml');
       final dynamic yamlMap = loadYaml(yamlString);
-      kOwnersHost = yamlMap['owners_host'];
-      kOwnersApi = yamlMap['owners_api'];
+      print(yamlString);
+      print(yamlMap);
+      kBackendHost = yamlMap['backend.host'];
+      kOwnersApi = yamlMap['api.owners'];
       isLoaded.complete(true);
     }
   }

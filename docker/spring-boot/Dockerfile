@@ -3,7 +3,7 @@ ARG WORKDIR_APP=/workspace/app
 ARG EXTRACTED=${WORKDIR_APP}/target/extracted
 
 # Build stage
-FROM maven:3-eclipse-temurin-17-alpine as builder
+FROM maven:3-eclipse-temurin-17-alpine AS builder
 
 ARG SERVICE_NAME
 ARG WORKDIR_APP
@@ -12,13 +12,15 @@ WORKDIR ${WORKDIR_APP}
 
 COPY pom.xml .
 COPY ./docker/pom.jsh .
-RUN jshell -R-Dproject=${SERVICE_NAME} pom.jsh
-COPY ${SERVICE_NAME}/pom.xml ./${SERVICE_NAME}/pom.xml
-RUN --mount=type=cache,target=/root/.m2 mvn -B dependency:resolve dependency:resolve-plugins dependency:go-offline
+COPY ${SERVICE_NAME}/*.xml ./${SERVICE_NAME}/
 COPY ${SERVICE_NAME}/src ./${SERVICE_NAME}/src
-RUN --mount=type=cache,target=/root/.m2 mvn -B install
-RUN --mount=type=cache,target=/root/.m2 mkdir -p target/extracted && \
-    java -Djarmode=layertools -jar ${SERVICE_NAME}/target/*.jar extract --destination target/extracted
+
+RUN jshell -R-Dproject=${SERVICE_NAME} pom.jsh
+
+RUN --mount=type=cache,target=/root/.m2 mvn -B dependency:resolve dependency:resolve-plugins dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 mvn -B install \
+    && mkdir -p target/extracted  \
+    && java -Djarmode=layertools -jar ${SERVICE_NAME}/target/*.jar extract --destination target/extracted
 
 # Run stage using non-root user
 # https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#container-images.dockerfiles
@@ -27,15 +29,12 @@ ARG USERNAME=developer
 ARG GROUPNAME=developergroup
 RUN addgroup -S "${GROUPNAME}"; adduser --ingroup "${GROUPNAME}" --disabled-password -S "${USERNAME}"
 
-# Tell docker that all future commands should run as the appuser user
-
+# Tell docker that all future commands should run as the user
 USER $USERNAME
 
 ARG WORKDIR_APP
 ARG EXTRACTED
 WORKDIR $WORKDIR_APP
-ARG EXPOSED_PORT
-EXPOSE $EXPOSED_PORT
 
 # Spring Boot build files
 COPY --from=builder $EXTRACTED/dependencies/ ./
