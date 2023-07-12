@@ -76,7 +76,7 @@ docker container run -d --name h2-server --network=MyBridgeNetwork -d -p 9092:15
 
 # Run tracing and monitoring servers
 docker container run -d --name zipkin-server --network MyBridgeNetwork -p 9411:9411 openzipkin/zipkin
-docker container run -d --name promtail-server --network MyBridgeNetwork -v  $(PWD)/docker/promtail/promtail-config.yaml:/mnt/config/promtail-config.yaml -v  $(PWD)/spring-petclinic-api-gateway/log:/var/log/spring-petclinic-api-gateway -v  $(PWD)/spring-petclinic-customer-service/log:/var/log/spring-petclinic-customer-service grafana/promtail:2.8.0 --config.file=/mnt/config/promtail-config.yaml
+docker container run -d --name promtail-server --network MyBridgeNetwork -v  $(PWD)/docker/promtail/promtail-config.yaml:/mnt/config/promtail-config.yaml -v  $(PWD)/spring-petclinic-api-gateway/log:/var/log/services -v  $(PWD)/spring-petclinic-customer-service/log:/var/log/services grafana/promtail:2.8.0 --config.file=/mnt/config/promtail-config.yaml
 docker container run -d --name loki-server --network MyBridgeNetwork -v  $(PWD)/docker/loki/loki-config.yaml:/mnt/config/loki-config.yaml -p 3100:3100 grafana/loki:2.8.0 --config.file=/mnt/config/loki-config.yaml
 docker container run -d --name prometheus-server --network MyBridgeNetwork -p 9090:9090 -v  $(PWD)/docker/prometheus/:/etc/prometheus/ prom/prometheus
 docker container run -d --name=grafana-server --network MyBridgeNetwork -p 3000:3000 -v  $(PWD)/docker/grafana/provisioning:/etc/grafana/provisioning -v  $(PWD)/docker/grafana/grafana.ini:/etc/grafana/grafana.ini -v  $(PWD)/docker/grafana/dashboards:/var/lib/grafana/dashboards grafana/grafana-oss
@@ -133,7 +133,7 @@ docker container run -d --name h2-server --network=MyBridgeNetwork -d -p 9092:15
 
 # Run tracing and monitoring servers
 docker container run -d --name zipkin-server --network MyBridgeNetwork -p 9411:9411 openzipkin/zipkin
-docker container run -d --name promtail-server --network MyBridgeNetwork -v  $(PWD)/docker/promtail/promtail-config.yaml:/mnt/config/promtail-config.yaml -v  $(PWD)/spring-petclinic-api-gateway/log:/var/log/spring-petclinic-api-gateway -v  $(PWD)/spring-petclinic-customer-service/log:/var/log/spring-petclinic-customer-service grafana/promtail:2.8.0 --config.file=/mnt/config/promtail-config.yaml
+docker container run -d --name promtail-server --network MyBridgeNetwork -v $(PWD)/docker/promtail/promtail-config.yaml:/mnt/config/promtail-config.yaml -v logVolume:/var/log/services grafana/promtail:2.8.0 --config.file=/mnt/config/promtail-config.yaml
 docker container run -d --name loki-server --network MyBridgeNetwork -v  $(PWD)/docker/loki/loki-config.yaml:/mnt/config/loki-config.yaml -p 3100:3100 grafana/loki:2.8.0 --config.file=/mnt/config/loki-config.yaml
 docker container run -d --name prometheus-server --network MyBridgeNetwork -p 9090:9090 -v  $(PWD)/docker/prometheus/:/etc/prometheus/ prom/prometheus
 docker container run -d --name=grafana-server --network MyBridgeNetwork -p 3000:3000 -v  $(PWD)/docker/grafana/provisioning:/etc/grafana/provisioning -v  $(PWD)/docker/grafana/grafana.ini:/etc/grafana/grafana.ini -v  $(PWD)/docker/grafana/dashboards:/var/lib/grafana/dashboards grafana/grafana-oss
@@ -145,12 +145,15 @@ docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t sprin
 docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-customer-service --build-arg SERVICE_NAME=spring-petclinic-customer-service .
 docker buildx build --progress=plain -f ./docker/flutter-api-gateway/Dockerfile -t spring-petclinic-api-gateway --build-arg SERVICE_NAME=spring-petclinic-api-gateway .
 
+# Manipulate some runtime configurations
+docker container run --rm -v logVolume:/var/log/services busybox /bin/sh -c 'touch .initialized && chown -R 10000:10001 /var/log/services'
+
 # Run Spring boot apps
-docker container run -d --name=config-server --network MyBridgeNetwork -p 7771:7771 spring-petclinic-config-server
-docker container run -d --name=discovery-server --network MyBridgeNetwork -p 7772:7772 --env CONFIG_SERVER_URL=http://config-server:7771/ spring-petclinic-discovery-server
-docker container run -d --name=admin-server --network MyBridgeNetwork -p 7776:7776 --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server spring-petclinic-admin-server
-docker container run -d --name=customers-service --network MyBridgeNetwork -p 7773:7773 --env CONFIG_SERVER_URL=http://config-server:7771/ --env H2HOST=h2-server --env H2PORT=1521 --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env SPRING_PROFILES_ACTIVE=default,h2 spring-petclinic-customer-service
-docker container run -d --name=api-gateway --network MyBridgeNetwork -p 7778:7778 --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans spring-petclinic-api-gateway
+docker container run -d --name=config-server --network MyBridgeNetwork -p 7771:7771 -v logVolume:/workspace/app/log spring-petclinic-config-server
+docker container run -d --name=discovery-server --network MyBridgeNetwork -p 7772:7772 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ spring-petclinic-discovery-server
+docker container run -d --name=admin-server --network MyBridgeNetwork -p 7776:7776 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server spring-petclinic-admin-server
+docker container run -d --name=customers-service --network MyBridgeNetwork -p 7773:7773 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env H2HOST=h2-server --env H2PORT=1521 --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env SPRING_PROFILES_ACTIVE=default,h2 spring-petclinic-customer-service
+docker container run -d --name=api-gateway --network MyBridgeNetwork -p 7778:7778 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env BACKEND_HOST=http://localhost:7778 spring-petclinic-api-gateway
 
 # Validate everything is working correctly by running
 # the test service and open spring-petclinic-test-service/target/site/index.html
@@ -158,3 +161,20 @@ docker container run -d --name=api-gateway --network MyBridgeNetwork -p 7778:777
 docker run -d --network MyBridgeNetwork -p 4444:4444 -p 7900:7900 --shm-size="2g" selenium/standalone-firefox:latest
 mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE
 ----
+
+.Services Locations
+[options="header,footer"]
+|===
+| Service | Endpoint
+| Discovery Server  | http://localhost:7772
+| Config Server  | http://localhost:7771
+| Flutter Web UI & API Gateway  | http://localhost:7778
+| Customers | http://localhost:7773
+| Vets | http://localhost:7774
+| Visits | http://localhost:7775
+| Tracing Server (Zipkin) | http://localhost:9411/zipkin/ (we use openzipkin)
+| Admin Server (Spring Boot Admin) | http://localhost:7776
+| Grafana Dashboards  | http://localhost:3000
+| Prometheus | http://localhost:9090
+| Loki | http://localhost:3100/metrics
+|===

@@ -27,7 +27,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn -B install \
 FROM eclipse-temurin:17-jdk-alpine
 ARG USERNAME=developer
 ARG GROUPNAME=developergroup
-RUN addgroup -S "${GROUPNAME}"; adduser --ingroup "${GROUPNAME}" --disabled-password -S "${USERNAME}"
+RUN addgroup --gid 10001 -S "${GROUPNAME}"; adduser -u 10000 --ingroup "${GROUPNAME}" --disabled-password -S "${USERNAME}"
 
 # Tell docker that all future commands should run as the user
 USER $USERNAME
@@ -37,8 +37,8 @@ ARG EXTRACTED
 WORKDIR $WORKDIR_APP
 
 # Spring Boot build files
-COPY --from=builder $EXTRACTED/dependencies/ ./
-COPY --from=builder $EXTRACTED/spring-boot-loader/ ./
-COPY --from=builder $EXTRACTED/snapshot-dependencies/ ./
-COPY --from=builder $EXTRACTED/application/ ./
+COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/dependencies/ ./
+COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/spring-boot-loader/ ./
+COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/snapshot-dependencies/ ./
+COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/application/ ./
 ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]

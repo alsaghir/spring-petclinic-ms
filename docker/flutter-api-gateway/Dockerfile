@@ -94,7 +94,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 FROM eclipse-temurin:17-jdk-alpine
 ARG USERNAME=developer
 ARG GROUPNAME=developergroup
-RUN addgroup -S "${GROUPNAME}"; adduser --ingroup "${GROUPNAME}" --disabled-password -S "${USERNAME}"
+RUN addgroup --gid 10001 -S "${GROUPNAME}"; adduser -u 10000 --ingroup "${GROUPNAME}" --disabled-password -S "${USERNAME}"
 
 # Tell docker that all future commands should run as the user
 USER $USERNAME
@@ -108,6 +108,5 @@ COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/dependencies/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/spring-boot-loader/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/snapshot-dependencies/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/application/ ./
-RUN ls -lah /workspace/app/BOOT-INF/classes/static/assets/assets/config.yaml
-RUN ls -lah /workspace/app/BOOT-INF/classes/static/assets/assets/config.yaml
+
 ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
