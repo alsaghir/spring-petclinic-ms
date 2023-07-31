@@ -38,20 +38,22 @@ As this is still work in progress, there are multiple stages to be done for a co
   * Complete front-end implementation
   * Include chaos (not final)
   * Unit tests
+  * CI/CD Tool
 * Documentation and architecture showcase
   * Architecture doc
-  * Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)
-  * Commands for starting services locally using docker desktop with docker being target platform
+  * [line-through]#Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)# * done
+  * [line-through]#Commands for starting services locally using docker desktop with docker being target platform# * done
   * Commands for starting services locally using docker-compose
 * All services to be up and running locally with default configuration
   * [line-through]#Make sure JOOQ generation of classes done automatically# * done
   * [line-through]#Generate external config for Observability and tracing for plug & play# * done
-  * Validate functionality of Grafana
+  * [line-through]#Validate functionality of Grafana# * done
   * Custom Labels in Grafana for prometheus and loki
 * [line-through]#Create separate module for testing all the up and running service automating that everything is up and running as expected# * done
 * [line-through]#All services to be up and running locally# * done
-* All services to be up and running using docker with and without local SDK
+* [line-through]#All services to be up and running using docker with and without local SDK# * done
 * All services to be up and running using docker compose
+* Unified files as source of commands to start commands without typing and test on Windows & MacOS
 
 == Start services locally
 
