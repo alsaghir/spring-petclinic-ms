@@ -3,13 +3,15 @@ package scripts;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.StringTokenizer;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StartAllDocker {
 
@@ -69,7 +71,7 @@ public class StartAllDocker {
         Thread.sleep(TimeUnit.SECONDS.toMillis(5));
 
         String[] testCommands = new String[]{
-                "docker run --name=firefox -d --network MyBridgeNetwork -p 4444:4444 -p 7900:7900 --shm-size=\"2g\" selenium/standalone-firefox:latest",
+                "docker run --name=firefox -d --network MyBridgeNetwork -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-firefox:latest",
                 "docker container run --name=test --network MyBridgeNetwork --rm -v $(PWD):/opt/app -v m2:/root/.m2 -e BROWSER_HOST=firefox maven:3-eclipse-temurin-17-alpine /bin/sh -c \"cd /opt/app && mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE\""
         };
 
@@ -143,14 +145,16 @@ class Common {
                 logger.info("Process Interrupted: " + ex.getMessage());
                 Thread.currentThread().interrupt();
             }
+
+            // If the process is still running, destroy it
+            if (process.isAlive()) {
+                process.destroy();
+            }
+
             if (process.exitValue() == 0) {
                 infoColored("Success", ANSI_GREEN);
             } else {
                 infoColored("Failure", ANSI_YELLOW);
-            }
-            // If the process is still running, destroy it
-            if (process.isAlive()) {
-                process.destroy();
             }
         }
     }
@@ -159,14 +163,15 @@ class Common {
         if (command.isEmpty())
             throw new IllegalArgumentException("Empty command");
 
-        StringTokenizer st = new StringTokenizer(command);
-        String[] cmdarray = new String[st.countTokens()];
-        for (int i = 0; st.hasMoreTokens(); i++)
-            cmdarray[i] = st.nextToken();
+        String regex = "\"([^\"]*)\"|(\\S+)";
+        Matcher m = Pattern.compile(regex).matcher(command);
+        ArrayList<String> cmdArray = new ArrayList<>();
+        while (m.find())
+            cmdArray.add(m.group(1) == null ? m.group(2) : m.group(1));
         if (command.startsWith("docker"))
-            return new ProcessBuilder().inheritIO().command(cmdarray).redirectErrorStream(true);
+            return new ProcessBuilder().inheritIO().command(cmdArray).redirectErrorStream(true);
         else
-            return new ProcessBuilder().command(cmdarray);
+            return new ProcessBuilder().command(cmdArray);
     }
 
     private static String modify(String command) {

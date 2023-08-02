@@ -29,6 +29,8 @@ ARG USERNAME=developer
 ARG GROUPNAME=developergroup
 RUN addgroup --gid 10001 -S "${GROUPNAME}"; adduser -u 10000 --ingroup "${GROUPNAME}" --disabled-password -S "${USERNAME}"
 
+RUN apk --no-cache add curl
+
 # Tell docker that all future commands should run as the user
 USER $USERNAME
 

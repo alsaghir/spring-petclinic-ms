@@ -19,6 +19,7 @@
               resultproperty="serialNumber"
               failonerror="true">
             <arg line="-Command flutter build web --web-renderer html"/>
+            <echo level="info" message="Flutter app build on Windows is successful"/>
         </exec>
 
         <exec if:true="${isUnix}"
@@ -29,13 +30,13 @@
             <arg line="-c"/>
             <arg line="'flutter build web --web-renderer html'"/>
         </exec>
-        <echo level="info" message="Flutter app build is successful"/>
+        <echo level="info" message="Flutter app build on *nix is successful"/>
     </target>
 
     <target name="copy-flutter-output">
         <copy todir="${target.location}" failonerror="true">
             <fileset dir="${build.location}"/>
         </copy>
-        <echo level="info" message="Flutter app build is successful"/>
+        <echo level="info" message="Flutter copy build is successful"/>
     </target>
 </project>
