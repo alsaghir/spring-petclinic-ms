@@ -9,18 +9,22 @@ import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.ElementHandle;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -39,7 +43,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
@@ -48,6 +51,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -65,25 +70,21 @@ class VerifyAllTest {
     private String gatewayHost;
     private String customerServiceHost;
 
+    // Selenium web driver
     WebDriver webDriver;
+
+    // Playwright objects
+    static Playwright playwright;
+    static Browser browser;
+
+    // Playwright New instance for each test method
+    BrowserContext context;
+    Page page;
 
     @BeforeAll
     void init() throws IOException, InterruptedException {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-
-        File file = resolver.getResource("classpath:config.yml").getFile();
-        YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
-        factory.setResources(new PathResource(file.toPath()));
-        factory.afterPropertiesSet();
-
-        Properties applicationProperties = factory.getObject();
-        assert applicationProperties != null;
-        PropertiesPropertySource ps = new PropertiesPropertySource("configProperties", applicationProperties);
-        StandardEnvironment env = new StandardEnvironment();
-        env.getPropertySources().addFirst(ps);
-        if (System.getProperty("host") != null)
-            env.getPropertySources().addFirst(new SimpleCommandLinePropertySource("--host=" + System.getProperty("host")));
-        env.setIgnoreUnresolvableNestedPlaceholders(true);
+        // Config loading
+        StandardEnvironment env = getStandardEnvironment();
         String remoteBrowserHost = env.getProperty("remote.browser.host");
         String remoteBrowserPort = env.getProperty("remote.browser.port");
         configServerHost = env.getProperty("config-server.host");
@@ -96,6 +97,33 @@ class VerifyAllTest {
         gatewayPort = env.getProperty("gateway-server.port");
         customerServiceHost = env.getProperty("customer-service.host");
         customerServicePort = env.getProperty("customer-service.port");
+
+        configureJsonAssertions();
+
+        verifyApiGatewayIsUp();
+
+        assert remoteBrowserHost != null;
+        /*webDriver = remoteBrowserHost.equals("localhost") ?
+                new FirefoxDriver(new FirefoxOptions()
+                        .setImplicitWaitTimeout(Duration.ofSeconds(10))
+                        .setScriptTimeout(Duration.ofSeconds(10))
+                        .setPageLoadTimeout(Duration.ofSeconds(10))
+                ) :
+                new RemoteWebDriver(new URL("http://" + remoteBrowserHost + ":" + remoteBrowserPort + "/wd/hub"),
+                        new FirefoxOptions()
+                                .setImplicitWaitTimeout(Duration.ofSeconds(5))
+                                .setScriptTimeout(Duration.ofSeconds(5))
+                                .setPageLoadTimeout(Duration.ofSeconds(5))
+                );*/
+
+        playwright = Playwright.create();
+        browser = playwright.firefox().launch();
+    }
+
+    /**
+     * Use JacksonJsonProvider for json resolving and assertions
+     */
+    private static void configureJsonAssertions() {
 
         Configuration.setDefaults(new Configuration.Defaults() {
             private final JsonProvider jsonProvider = new JacksonJsonProvider();
@@ -116,61 +144,28 @@ class VerifyAllTest {
                 return EnumSet.noneOf(Option.class);
             }
         });
-
-        verifyApiGatewayIsUp();
-
-
-        assert remoteBrowserHost != null;
-        webDriver = remoteBrowserHost.equals("localhost") ?
-                new FirefoxDriver(new FirefoxOptions()
-                        .setImplicitWaitTimeout(Duration.ofSeconds(10))
-                        .setScriptTimeout(Duration.ofSeconds(10))
-                        .setPageLoadTimeout(Duration.ofSeconds(10))
-                ) :
-                new RemoteWebDriver(new URL("http://" + remoteBrowserHost + ":" + remoteBrowserPort + "/wd/hub"),
-                        new FirefoxOptions()
-                                .setImplicitWaitTimeout(Duration.ofSeconds(5))
-                                .setScriptTimeout(Duration.ofSeconds(5))
-                                .setPageLoadTimeout(Duration.ofSeconds(5))
-                );
-
     }
 
-    @SuppressWarnings("java:S2925")
-    private void verifyApiGatewayIsUp() throws InterruptedException {
-        boolean apiGateWayIsUp = false;
-        int counter = 0;
-        while (!apiGateWayIsUp) {
-            counter++;
-            WebClient webClient = WebClient.create("http://" + gatewayHost + ":" + gatewayPort);
-            HttpStatusCode code;
-            try {
-                code = webClient.get().uri("/api/customer/owners")
-                        .retrieve()
-                        .toBodilessEntity()
-                        .map(ResponseEntity::getStatusCode)
-                        .block();
-
-            } catch (Exception ex) {
-                System.out.println("Connection Failure");
-                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-                continue;
-            }
-            assert code != null;
-            if (code.equals(HttpStatus.OK) || counter == 10)
-                apiGateWayIsUp = true;
-
-
-        }
-    }
 
     @AfterAll
     void last() {
-        webDriver.quit();
+        //  webDriver.quit();
+        playwright.close();
+    }
+
+    @BeforeEach
+    void createContextAndPage() {
+        context = browser.newContext();
+        page = context.newPage();
+    }
+
+    @AfterEach
+    void closeContext() {
+        context.close();
     }
 
     @Test
-    void whenBrowserRequestOwners_ThenElementsRenderedSuccessfully() {
+    void whenBrowserRequestOwners_ThenElementsRenderedSuccessfullySelenium() {
 
         int attempts = 0;
         while (attempts < 2) {
@@ -187,8 +182,8 @@ class VerifyAllTest {
                                         .filter(we -> we.getText().equals("City")).findAny()));
 
                 // Then
-                Assertions.assertNotNull(webDriver.getTitle());
-                Assertions.assertEquals("Pet Clinic App", webDriver.getTitle());
+                assertNotNull(webDriver.getTitle());
+                assertEquals("Pet Clinic App", webDriver.getTitle());
                 Assertions.assertTrue(atleastOneOwner.isPresent());
                 break;
             } catch (StaleElementReferenceException e) {
@@ -196,35 +191,22 @@ class VerifyAllTest {
             }
             attempts++;
         }
+    }
 
-        // TODO Remove
-       /* attempts = 0;
-        while (attempts < 2) {
-            try {
-                // Given
-                webDriver.get("http://" + gatewayHost + ":" + gatewayPort + "/#/owners");
+    @Test
+    void whenBrowserRequestOwners_ThenElementsRenderedSuccessfullyPlaywright() {
+        // Given
+        page.navigate("http://" + gatewayHost + ":" + gatewayPort + "/#/owners");
+        var elementHandle = page.waitForSelector("flt-glass-pane", new Page.WaitForSelectorOptions().setTimeout(Duration.ofSeconds(20).toMillis()));
 
-                // When
-                WebDriverWait webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(20), Duration.ofSeconds(20));
-                WebElement glassPane = webDriverWait.pollingEvery(Duration.ofSeconds(5)).
-                        until(presenceOfElementLocated(By.tagName("flt-glass-pane")));
+        // When
+        assertNotNull(elementHandle);
+        ElementHandle spanElement = elementHandle.waitForSelector("flt-span:has-text('City')");
 
-                SearchContext shadowRoot = (SearchContext) ((JavascriptExecutor) webDriver).executeScript("return arguments[0].shadowRoot", glassPane);
-                Optional<WebElement> cityElement = webDriverWait.until(ExpectedConditions.visibilityOf(shadowRoot.findElement(By.cssSelector("flt-span"))))
-                        .findElements(By.tagName("flt-span")).stream()
-                        .filter(we -> we.getText().equals("City"))
-                        .findFirst();
-
-                // Then
-                Assertions.assertNotNull(webDriver.getTitle());
-                Assertions.assertEquals("Pet Clinic App", webDriver.getTitle());
-                Assertions.assertTrue(cityElement.isPresent());
-                break;
-            } catch (StaleElementReferenceException e) {
-                e.printStackTrace();
-            }
-            attempts++;
-        }*/
+        // Then
+        assertNotNull(spanElement);
+        assertEquals("City", spanElement.innerText());
+        assertEquals("Pet Clinic App", page.title());
     }
 
     @Test
@@ -242,8 +224,8 @@ class VerifyAllTest {
 
         // Then
         String appName = JsonPath.parse(result).read("$.name", String.class);
-        Assertions.assertNotNull(appName);
-        Assertions.assertEquals("config-server", appName);
+        assertNotNull(appName);
+        assertEquals("config-server", appName);
     }
 
     @Test
@@ -262,7 +244,7 @@ class VerifyAllTest {
         // Then
         List<String> appNames = JsonPath.parse(result).read("$.applications.application[*].name", new TypeRef<>() {
         });
-        Assertions.assertNotNull(appNames);
+        assertNotNull(appNames);
         Assertions.assertFalse(CollectionUtils.isEmpty(appNames));
         appNames.forEach(s -> Assertions.assertTrue(StringUtils.hasText(s)));
         Assertions.assertTrue(appNames.contains("API-GATEWAY"));
@@ -286,7 +268,7 @@ class VerifyAllTest {
         // Then
         List<String> appNames = JsonPath.parse(result).read("$[*].registration.name", new TypeRef<>() {
         });
-        Assertions.assertNotNull(appNames);
+        assertNotNull(appNames);
         Assertions.assertFalse(CollectionUtils.isEmpty(appNames));
         appNames.forEach(s -> Assertions.assertTrue(StringUtils.hasText(s)));
         Assertions.assertTrue(appNames.contains("API-GATEWAY"));
@@ -310,7 +292,7 @@ class VerifyAllTest {
         // Then
         String uri = JsonPath.parse(result).read("$[0].uri", new TypeRef<>() {
         });
-        Assertions.assertNotNull(uri);
+        assertNotNull(uri);
         Assertions.assertFalse(uri.isBlank());
     }
 
@@ -337,9 +319,67 @@ class VerifyAllTest {
 
         // Then
         Integer id = JsonPath.parse(resultDirect).read("$[0].id", Integer.class);
-        Assertions.assertNotNull(id);
+        assertNotNull(id);
 
         id = JsonPath.parse(resultApiGateway).read("$[0].id", Integer.class);
-        Assertions.assertNotNull(id);
+        assertNotNull(id);
+    }
+
+
+    /**
+     * @return {@link StandardEnvironment} represents the configured environment
+     * @throws IOException in case of error reading the config file
+     */
+    private static StandardEnvironment getStandardEnvironment() throws IOException {
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+
+        File file = resolver.getResource("classpath:config.yml").getFile();
+        YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
+        factory.setResources(new PathResource(file.toPath()));
+        factory.afterPropertiesSet();
+
+        Properties applicationProperties = factory.getObject();
+        assert applicationProperties != null;
+        PropertiesPropertySource ps = new PropertiesPropertySource("configProperties", applicationProperties);
+        StandardEnvironment env = new StandardEnvironment();
+        env.getPropertySources().addFirst(ps);
+        if (System.getProperty("host") != null)
+            env.getPropertySources().addFirst(new SimpleCommandLinePropertySource("--host=" + System.getProperty("host")));
+        env.setIgnoreUnresolvableNestedPlaceholders(true);
+        return env;
+    }
+
+    /**
+     * retry hitting the api gateway owners end point
+     * as a proof of being ready for completing all other tests
+     *
+     * @throws InterruptedException if process interrupted
+     */
+    @SuppressWarnings("java:S2925")
+    private void verifyApiGatewayIsUp() throws InterruptedException {
+        boolean apiGateWayIsUp = false;
+        int counter = 0;
+        while (!apiGateWayIsUp) {
+            counter++;
+            WebClient webClient = WebClient.create("http://" + gatewayHost + ":" + gatewayPort);
+            HttpStatusCode code;
+            try {
+                code = webClient.get().uri("/api/customer/owners")
+                        .retrieve()
+                        .toBodilessEntity()
+                        .map(ResponseEntity::getStatusCode)
+                        .block();
+
+            } catch (Exception ex) {
+                System.out.println("Connection Failure");
+                Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+                continue;
+            }
+            assert code != null;
+            if (code.equals(HttpStatus.OK) || counter == 10)
+                apiGateWayIsUp = true;
+
+
+        }
     }
 }

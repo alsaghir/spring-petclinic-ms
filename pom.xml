@@ -44,6 +44,7 @@
         <micrometer.version>1.11.1</micrometer.version>
         <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
         <selenium-java.version>4.10.0</selenium-java.version>
+        <playwright.version>1.36.0</playwright.version>
         <maven-surefire-report-plugin.version>3.1.2</maven-surefire-report-plugin.version>
     </properties>
 

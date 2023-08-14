@@ -43,3 +43,6 @@ local.properties
 .idea
 *.iml
 *.ipr
+
+# drawio
+.bkp
