@@ -1,1 +1,2 @@
 api.owners: '/api/customer/owners'
+backend.host: 'http://localhost:7778'

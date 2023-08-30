@@ -25,6 +25,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -43,6 +46,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
@@ -103,7 +107,7 @@ class VerifyAllTest {
         verifyApiGatewayIsUp();
 
         assert remoteBrowserHost != null;
-        /*webDriver = remoteBrowserHost.equals("localhost") ?
+        webDriver = remoteBrowserHost.equals("localhost") ?
                 new FirefoxDriver(new FirefoxOptions()
                         .setImplicitWaitTimeout(Duration.ofSeconds(10))
                         .setScriptTimeout(Duration.ofSeconds(10))
@@ -114,7 +118,7 @@ class VerifyAllTest {
                                 .setImplicitWaitTimeout(Duration.ofSeconds(5))
                                 .setScriptTimeout(Duration.ofSeconds(5))
                                 .setPageLoadTimeout(Duration.ofSeconds(5))
-                );*/
+                );
 
         playwright = Playwright.create();
         browser = playwright.firefox().launch();
@@ -149,7 +153,7 @@ class VerifyAllTest {
 
     @AfterAll
     void last() {
-        //  webDriver.quit();
+        webDriver.quit();
         playwright.close();
     }
 
@@ -194,7 +198,7 @@ class VerifyAllTest {
     }
 
     @Test
-    void whenBrowserRequestOwners_ThenElementsRenderedSuccessfullyPlaywright() {
+    void whenBrowserRequestOwners_ThenElementsRenderedSuccessfully() {
         // Given
         page.navigate("http://" + gatewayHost + ":" + gatewayPort + "/#/owners");
         var elementHandle = page.waitForSelector("flt-glass-pane", new Page.WaitForSelectorOptions().setTimeout(Duration.ofSeconds(20).toMillis()));

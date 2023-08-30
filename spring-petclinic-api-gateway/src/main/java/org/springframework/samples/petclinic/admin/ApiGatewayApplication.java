@@ -2,23 +2,43 @@ package org.springframework.samples.petclinic.admin;
 
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.encoder.LogstashEncoder;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.boot.autoconfigure.web.reactive.ResourceHandlerRegistrationCustomizer;
+import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
+import org.springframework.boot.web.codec.CodecCustomizer;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.http.HttpMethod;
+import org.springframework.lang.NonNull;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
+import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
+import org.springframework.web.reactive.result.view.ViewResolver;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -27,6 +47,7 @@ import java.util.Properties;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class ApiGatewayApplication {
+
     public static void main(String[] args) {
         log.info("Started and logstash is loaded and its name is " + LogstashEncoder.class.getSimpleName());
         SpringApplication.run(ApiGatewayApplication.class, args);
@@ -67,5 +88,43 @@ public class ApiGatewayApplication {
             writer.close();
         };
 
+    }
+
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Qualifier("corsConfigurer")
+    public WebFluxConfigurer corsConfigurer(WebProperties webProperties,
+                                            WebFluxProperties webFluxProperties,
+                                            ListableBeanFactory beanFactory,
+                                            ObjectProvider<HandlerMethodArgumentResolver> resolvers,
+                                            ObjectProvider<CodecCustomizer> codecCustomizers,
+                                            ObjectProvider<ResourceHandlerRegistrationCustomizer> resourceHandlerRegistrationCustomizer,
+                                            ObjectProvider<ViewResolver> viewResolvers) {
+        return new WebFluxAutoConfiguration.WebFluxConfig(webProperties,
+                webFluxProperties,
+                beanFactory,
+                resolvers,
+                codecCustomizers,
+                resourceHandlerRegistrationCustomizer,
+                viewResolvers) {
+
+            @Override
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
+
+                registry.addMapping("/**").allowedOriginPatterns(Constant.ALLOWED_ORIGIN_PATTERNS.get())
+                        .allowedMethods(HttpMethod.GET.name(), HttpMethod.OPTIONS.name());
+            }
+        };
+    }
+
+    @Bean
+    public CorsWebFilter corsWebFilter() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOriginPatterns(List.of(Constant.ALLOWED_ORIGIN_PATTERNS.get()));
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.OPTIONS.name(), HttpMethod.POST.name()));
+        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return new CorsWebFilter(corsConfigurationSource);
     }
 }
