@@ -1,4 +1,4 @@
-# petclinic_ui
+# petclinicui
 
 A new Flutter project.
 

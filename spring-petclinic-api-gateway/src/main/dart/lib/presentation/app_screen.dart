@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../conf/configurations.dart';
-
 /// A common widget acts as a container for the whole app.
 /// Routes navigate to this widget and any pre or post
 /// rendering logic goes here. Example of that is loading config
@@ -16,13 +14,6 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppScreenState extends State<AppScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, () {
-      Config.loadAssets(context);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {

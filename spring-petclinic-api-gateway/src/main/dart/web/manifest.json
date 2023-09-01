@@ -1,6 +1,6 @@
 {
-    "name": "petclinic_ui",
-    "short_name": "petclinic_ui",
+    "name": "petclinicui",
+    "short_name": "petclinicui",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

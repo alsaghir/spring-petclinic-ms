@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'conf/providers.dart';
 import 'presentation/app_screen.dart';
+import 'presentation/commons.dart';
 import 'presentation/home.dart';
 import 'presentation/new_owner.dart';
 import 'presentation/owners.dart';
@@ -24,7 +26,8 @@ class MyApp extends HookConsumerWidget {
         GoRoute(
           name: 'home',
           path: '/home',
-          builder: (context, state) => const AppScreen(tabContent: HomeScreen()),
+          builder: (context, state) =>
+              const AppScreen(tabContent: HomeScreen()),
         ),
         GoRoute(
             name: 'owners',
@@ -36,6 +39,13 @@ class MyApp extends HookConsumerWidget {
               GoRoute(
                 name: 'newOwner',
                 path: 'new',
+                builder: (context, state) => AppScreen(
+                  tabContent: NewOwnerScreen(),
+                ),
+              ),
+              GoRoute(
+                name: 'editOwner',
+                path: 'edit/:id',
                 builder: (context, state) => AppScreen(
                   tabContent: NewOwnerScreen(),
                 ),
@@ -56,10 +66,15 @@ class MyApp extends HookConsumerWidget {
       ],
     );
 
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: router,
-      title: "Pet Clinic App",
-    );
+    AsyncValue<Config> config = ref.watch(configProvider);
+
+    return config.when(
+        error: (error, stackTrace) => Text(error.toString()),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        data: (data) => MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              routerConfig: router,
+              title: "Pet Clinic App",
+            ));
   }
 }
