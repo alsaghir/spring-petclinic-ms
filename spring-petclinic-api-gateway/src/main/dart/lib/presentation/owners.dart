@@ -113,26 +113,12 @@ class OwnersListWidgetState extends ConsumerState<OwnersListWidget> {
                 children: [
                   IconButton(
                       onPressed: () {
-                        print("hello");
                         print(owners[index].id);
-                        //var r = GoRouter.of(context);
-                        //fetchOwners() =>
-                        ref
-                            .read(ownersNotifierProvider.notifier)
-                            .fetchAllOwners();
-                        // r.addListener(fetchOwners);
-                        // r.goNamed("editOwner");
+                        GoRouter.of(context).goNamed("editOwner", params: {"id": "${owners[index].id}"});
                       },
                       icon: const Icon(
                         Icons.edit,
                         color: Colors.green,
-                        size: 16,
-                      )),
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.red,
                         size: 16,
                       )),
                 ],

@@ -122,7 +122,7 @@ public class ApiGatewayApplication {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(List.of(Constant.ALLOWED_ORIGIN_PATTERNS.get()));
         corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.OPTIONS.name(), HttpMethod.POST.name()));
+        corsConfiguration.setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.OPTIONS.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.DELETE.name()));
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
         corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
         return new CorsWebFilter(corsConfigurationSource);

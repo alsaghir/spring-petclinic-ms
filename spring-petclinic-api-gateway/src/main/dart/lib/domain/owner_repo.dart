@@ -1,19 +1,21 @@
 import 'package:dio/dio.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:petclinicui/presentation/commons.dart';
 
 import "../../conf/providers.dart";
 import 'owner.dart';
 
 class OwnersNotifier extends StateNotifier<List<Owner>> {
-  OwnersNotifier({required this.httpClient}) : super(const []) {
+  OwnersNotifier({required this.httpClient, required this.config}) : super(const []) {
     fetchAllOwners();
   }
 
+  final Config? config;
   final Dio httpClient;
   List<Owner> owners = [];
 
   Future<void> fetchAllOwners() async {
-    Response<List<dynamic>> data = await httpClient.get("http://localhost:7778/api/customer/owners",
+    Response<List<dynamic>> data = await httpClient.get(config!.ownersEndpoint(),
         options: Options(contentType: Headers.jsonContentType));
     owners = Owner.fromJson(data);
     state = [...owners];
@@ -34,7 +36,9 @@ class OwnersNotifier extends StateNotifier<List<Owner>> {
 
 final ownersNotifierProvider =
 StateNotifierProvider<OwnersNotifier, List<Owner>>((ref) {
+  final config = ref.watch(configProvider);
   return OwnersNotifier(
     httpClient: ref.read(httpClientProvider),
+    config: config,
   );
 });

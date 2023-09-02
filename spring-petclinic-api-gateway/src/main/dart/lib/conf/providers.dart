@@ -9,7 +9,14 @@ final httpClientProvider = Provider<Dio>((ref) {
   return Dio();
 });
 
-final configProvider = FutureProvider<Config>((ref) async {
+final configProvider = Provider<Config?>((ref) {
+  final AsyncValue<Config> config = ref.watch(asyncConfigProvider);
+
+
+  return config.maybeWhen(orElse: () => null, data: (config) => config);
+});
+
+final asyncConfigProvider = FutureProvider<Config>((ref) async {
   final yamlString = await rootBundle.loadString('assets/config.yaml');
   final dynamic yamlMap = loadYaml(yamlString);
 

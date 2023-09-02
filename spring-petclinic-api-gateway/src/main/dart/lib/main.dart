@@ -40,14 +40,14 @@ class MyApp extends HookConsumerWidget {
                 name: 'newOwner',
                 path: 'new',
                 builder: (context, state) => AppScreen(
-                  tabContent: NewOwnerScreen(),
+                  tabContent: NewOwnerScreen(ownerId: null,),
                 ),
               ),
               GoRoute(
                 name: 'editOwner',
                 path: 'edit/:id',
                 builder: (context, state) => AppScreen(
-                  tabContent: NewOwnerScreen(),
+                  tabContent: NewOwnerScreen(ownerId: int.parse(state.params['id']!)),
                 ),
               ),
             ]),
@@ -66,7 +66,7 @@ class MyApp extends HookConsumerWidget {
       ],
     );
 
-    AsyncValue<Config> config = ref.watch(configProvider);
+    AsyncValue<Config> config = ref.watch(asyncConfigProvider);
 
     return config.when(
         error: (error, stackTrace) => Text(error.toString()),
