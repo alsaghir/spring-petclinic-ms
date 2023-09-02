@@ -31,16 +31,11 @@ class OwnersScreen extends HookConsumerWidget {
   }
 }
 
-class OwnersListWidget extends StatefulHookConsumerWidget {
-  const OwnersListWidget({Key? key}) : super(key: key);
+class OwnersListWidget extends HookConsumerWidget {
+  const OwnersListWidget({super.key});
 
   @override
-  OwnersListWidgetState createState() => OwnersListWidgetState();
-}
-
-class OwnersListWidgetState extends ConsumerState<OwnersListWidget> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final owners = ref.watch(ownersNotifierProvider);
 
     return Expanded(

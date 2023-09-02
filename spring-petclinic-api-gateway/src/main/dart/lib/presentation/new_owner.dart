@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -7,7 +8,7 @@ import '../conf/providers.dart';
 import '../domain/owner.dart';
 import '../domain/owner_repo.dart';
 
-final  AutoDisposeFutureProviderFamily<Owner?, int?> ownerToEditProvider =
+final AutoDisposeFutureProviderFamily<Owner?, int?> ownerToEditProvider =
     FutureProvider.autoDispose.family<Owner?, int?>((ref, ownerId) {
   if (ownerId == null) return null;
   final httpClient = ref.watch(httpClientProvider);
@@ -22,11 +23,16 @@ final  AutoDisposeFutureProviderFamily<Owner?, int?> ownerToEditProvider =
 });
 
 /// https://docs.flutter.dev/cookbook/forms
-class NewOwnerScreen extends HookConsumerWidget {
-  NewOwnerScreen({required this.ownerId, super.key});
+class NewOwnerScreen extends StatefulHookConsumerWidget {
+  const NewOwnerScreen({required this.ownerId, super.key});
 
   final int? ownerId;
 
+  @override
+  NewOwnerScreenState createState() => NewOwnerScreenState();
+}
+
+class NewOwnerScreenState extends ConsumerState<NewOwnerScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _firstNameController = TextEditingController();
@@ -39,20 +45,24 @@ class NewOwnerScreen extends HookConsumerWidget {
       StateProvider<bool>((ref) => false);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-
+  Widget build(BuildContext context) {
     final config = ref.watch(configProvider);
     final dio = ref.watch(httpClientProvider);
     final isLoading = ref.watch(loadingProvider);
-    AsyncValue<Owner?> ownerForEdit = ref.watch(ownerToEditProvider(ownerId));
+    AsyncValue<Owner?> ownerForEdit =
+        ref.watch(ownerToEditProvider(widget.ownerId));
     print(ownerForEdit.value?.toJson());
-    if (ownerForEdit.value != null) {
-      _firstNameController.text = ownerForEdit.value!.firstName;
-      _lastNameController.text = ownerForEdit.value!.lastName;
-      _addressController.text = ownerForEdit.value!.address;
-      _cityController.text = ownerForEdit.value!.city;
-      _telephoneController.text = ownerForEdit.value!.telephone;
-    }
+
+    useEffect(() {
+      if (ownerForEdit.value != null) {
+        _firstNameController.text = ownerForEdit.value!.firstName;
+        _lastNameController.text = ownerForEdit.value!.lastName;
+        _addressController.text = ownerForEdit.value!.address;
+        _cityController.text = ownerForEdit.value!.city;
+        _telephoneController.text = ownerForEdit.value!.telephone;
+      }
+      return null;
+    });
 
     return ownerForEdit.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -177,22 +187,23 @@ class NewOwnerScreen extends HookConsumerWidget {
                                           telephone: _telephoneController.text);
                                       Response response;
                                       try {
-                                        if(loadedOwner == null) {
+                                        if (loadedOwner == null) {
                                           response = await dio.post(
                                               config!.ownersEndpoint(),
                                               data: owner.toJson(),
                                               options: Options(
                                                   contentType:
-                                                  Headers.jsonContentType));
+                                                      Headers.jsonContentType));
                                         } else {
                                           response = await dio.put(
                                               "${config!.ownersEndpoint()}/${loadedOwner.id}",
                                               data: owner.toJson(),
                                               options: Options(
                                                   contentType:
-                                                  Headers.jsonContentType));
+                                                      Headers.jsonContentType));
                                         }
-                                        if (response.statusCode == 201 || response.statusCode == 204) {
+                                        if (response.statusCode == 201 ||
+                                            response.statusCode == 204) {
                                           await ref
                                               .read(ownersNotifierProvider
                                                   .notifier)
