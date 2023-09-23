@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-
 import '../domain/owner_repo.dart';
 import 'commons.dart';
 
@@ -12,22 +11,21 @@ class OwnersScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-            appBar: Commons.appBar(),
-            body: SafeArea(
-              child: Column(
-                  children: [
-                    SearchOwnersWidget(),
-                    const OwnersListWidget(),
-                  ],
-                ),
-            ),
-
-            floatingActionButton: FloatingActionButton(
-              onPressed: () => GoRouter.of(context).goNamed("newOwner"),
-              tooltip: 'add owner',
-              child: const Icon(Icons.add),
-            ),
-          );
+      appBar: Commons.appBar(),
+      body: SafeArea(
+        child: Column(
+          children: [
+            SearchOwnersWidget(),
+            const OwnersListWidget(),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => GoRouter.of(context).goNamed("newOwner"),
+        tooltip: 'add owner',
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
 
@@ -108,11 +106,21 @@ class OwnersListWidget extends HookConsumerWidget {
                 children: [
                   IconButton(
                       onPressed: () {
-                        print(owners[index].id);
-                        GoRouter.of(context).goNamed("editOwner", params: {"id": "${owners[index].id}"});
+                        GoRouter.of(context).goNamed("editOwner",
+                            params: {"id": "${owners[index].id}"});
                       },
                       icon: const Icon(
                         Icons.edit,
+                        color: Colors.green,
+                        size: 16,
+                      )),
+                  IconButton(
+                      onPressed: () {
+                        GoRouter.of(context).goNamed("viewOwner",
+                            params: {"id": "${owners[index].id}"});
+                      },
+                      icon: const Icon(
+                        Icons.preview,
                         color: Colors.green,
                         size: 16,
                       )),

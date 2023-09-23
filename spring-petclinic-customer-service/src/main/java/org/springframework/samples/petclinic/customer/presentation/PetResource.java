@@ -37,7 +37,16 @@ public class PetResource {
     public PetData processCreationForm(@PathVariable("ownerId") @Min(1) Integer ownerId,
             @Valid @RequestBody PetCommand petCommand) {
 
-        return petService.createPet(ownerId, petCommand);
+        return petService.createPet(ownerId, null, petCommand);
+    }
+
+    @PostMapping("/owners/{ownerId}/pets/{petId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public PetData processUpdatingForm(@PathVariable("ownerId") @Min(1) Integer ownerId,
+            @PathVariable("petId") @Min(1) Integer petId,
+            @Valid @RequestBody PetCommand petCommand) {
+
+        return petService.createPet(ownerId, petId, petCommand);
     }
 
     @GetMapping("owners/*/pets/{petId}")

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:petclinicui/presentation/form_pet.dart';
+import 'package:petclinicui/presentation/owner_details.dart';
 
 import 'conf/providers.dart';
+import 'form_visit.dart';
 import 'presentation/app_screen.dart';
 import 'presentation/commons.dart';
 import 'presentation/home.dart';
-import 'presentation/new_owner.dart';
+import 'presentation/form_owner.dart';
 import 'presentation/owners.dart';
 
 void main() {
@@ -20,7 +23,7 @@ class MyApp extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // GoRouter configuration
     var router = GoRouter(
-      initialLocation: '/owners',
+      initialLocation: '/owners/5',
       debugLogDiagnostics: true,
       routes: [
         GoRoute(
@@ -39,17 +42,54 @@ class MyApp extends HookConsumerWidget {
               GoRoute(
                 name: 'newOwner',
                 path: 'new',
-                builder: (context, state) => AppScreen(
-                  tabContent: NewOwnerScreen(ownerId: null,),
+                builder: (context, state) => const AppScreen(
+                  tabContent: NewOwnerScreen(
+                    ownerId: null,
+                  ),
                 ),
               ),
               GoRoute(
                 name: 'editOwner',
                 path: 'edit/:id',
                 builder: (context, state) => AppScreen(
-                  tabContent: NewOwnerScreen(ownerId: int.parse(state.params['id']!)),
+                  tabContent:
+                      NewOwnerScreen(ownerId: int.parse(state.params['id']!)),
                 ),
               ),
+              GoRoute(
+                  name: 'viewOwner',
+                  path: ':id',
+                  builder: (context, state) => AppScreen(
+                        tabContent: OwnerDetailsScreen(
+                            ownerId: int.parse(state.params['id']!)),
+                      ),
+                  routes: <GoRoute>[
+                    GoRoute(
+                      name: 'addPet',
+                      path: 'pets',
+                      builder: (context, state) => AppScreen(
+                        tabContent: FormPetScreen(
+                            ownerId: int.parse(state.params['id']!),
+                            petId: null),
+                      ),
+                    ),
+                    GoRoute(
+                      name: 'editPet',
+                      path: 'pets/:petId',
+                      builder: (context, state) => AppScreen(
+                        tabContent: FormPetScreen(
+                            ownerId: int.parse(state.params['id']!),
+                            petId: int.parse(state.params['petId']!)),
+                      ),
+                    ),
+                    GoRoute(
+                      name: 'addVisit',
+                      path: 'pets/:petId/visits/new',
+                      builder: (context, state) => const AppScreen(
+                        tabContent: FormVisitScreen(),
+                      ),
+                    ),
+                  ]),
             ]),
         GoRoute(
           name: 'veterinarians',

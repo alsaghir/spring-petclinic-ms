@@ -62,6 +62,36 @@
             <artifactId>problem-spring-web-starter</artifactId>
         </dependency>
 
+         <!-- Observability START -->
+        <!-- https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.metrics -->
+        <!-- Metrics -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Tracing -->
+        <!-- https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.micrometer-tracing.tracers -->
+        <!-- https://micrometer.io/docs/tracing#_supported_tracers -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+        <!-- https://micrometer.io/docs/tracing#_installing_3 -->
+        <dependency>
+            <groupId>io.zipkin.reporter2</groupId>
+            <artifactId>zipkin-reporter-brave</artifactId>
+        </dependency>
+        <!--https://www.baeldung.com/spring-boot-3-observability-->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Observability END -->
+
+
         <!-- Third parties -->
         <dependency>
             <groupId>org.openapitools</groupId>
@@ -85,6 +115,13 @@
 
     <build>
         <plugins>
+<plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
@@ -150,6 +187,7 @@
                         <url>${db.url}</url>
                         <user>${db.username}</user>
                         <password>${db.password}</password>
+                        <schema>${db.schema}</schema>
                     </jdbc>
 
                     <!-- Generator parameters -->

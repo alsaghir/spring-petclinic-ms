@@ -1,0 +1,61 @@
+{
+    "configurations": [
+        {
+            "name": "Flutter (lib/main.dart)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "spring-petclinic-api-gateway/src/main/dart",
+            "program": "lib/main.dart"
+        },
+        {
+            "type": "java",
+            "name": "ConfigServerApplication",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.springframework.samples.petclinic.config.ConfigServerApplication",
+            "projectName": "spring-petclinic-config-server",
+            "args": "--spring.profiles.active=native --config.file-repo=/Users/elsagheera/Desktop/code/spring-petclinic-ms-config/",
+            "env": {}
+        },
+        {
+            "type": "java",
+            "name": "DiscoveryServerApplication",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.springframework.samples.petclinic.discovery.DiscoveryServerApplication",
+            "projectName": "spring-petclinic-discovery-server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "ApiGatewayApplication",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.springframework.samples.petclinic.admin.ApiGatewayApplication",
+            "projectName": "spring-petclinic-api-gateway",
+            "vmArgs": "-Dlogback.debug=true",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "CustomersServiceApplication",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.springframework.samples.petclinic.customer.CustomersServiceApplication",
+            "projectName": "spring-petclinic-customer-service",
+            "vmArgs": "-Dspring.profiles.active=default,h2",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "VisitsServiceApplication",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "org.springframework.samples.petclinic.visit.VisitsServiceApplication",
+            "projectName": "spring-petclinic-visits-service",
+            "vmArgs": "-Dspring.profiles.active=default,h2",
+            "envFile": "${workspaceFolder}/.env"
+        },
+    ]
+}

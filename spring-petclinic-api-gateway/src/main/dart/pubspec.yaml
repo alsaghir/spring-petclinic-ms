@@ -41,7 +41,10 @@ dependencies:
   url_launcher: ^6.1.10 # For making clickable links mainly for routing
   dio: ^5.1.1 # Http client
   flutter_hooks: ^0.20.1
-  hooks_riverpod: ^2.3.10
+  hooks_riverpod: ^2.4.0
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+  riverpod_annotation: ^2.1.5
 
 dev_dependencies:
   flutter_test:
@@ -54,7 +57,12 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   lints: ^2.1.1
-  riverpod_lint: ^2.0.3
+  riverpod_lint: ^2.0.4
+  build_runner: ^2.4.6
+  freezed: ^2.4.2
+  json_serializable: ^6.7.1
+  riverpod_generator: ^2.3.2
+  custom_lint: ^0.5.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

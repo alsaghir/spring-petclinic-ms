@@ -46,6 +46,13 @@ public class V1__Base_tables extends BaseJavaMigration {
         try (PreparedStatement statement = connection.prepareStatement(sqlDdl)) {
             statement.execute();
         }
+
+        encoded = Files.readAllBytes(ResourceUtils.getFile("classpath:db/h2/initial_data.sql").toPath());
+        String sqlDml = new String(encoded, StandardCharsets.UTF_8);
+
+        try (PreparedStatement statement = connection.prepareStatement(sqlDml)) {
+            statement.execute();
+        }
     }
 
 }

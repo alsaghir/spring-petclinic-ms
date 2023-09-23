@@ -1,7 +1,12 @@
 package org.springframework.samples.petclinic.admin;
 
-import lombok.extern.slf4j.Slf4j;
-import net.logstash.logback.encoder.LogstashEncoder;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,7 +29,6 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.HttpMethod;
-import org.springframework.lang.NonNull;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -34,14 +38,8 @@ import org.springframework.web.reactive.result.method.HandlerMethodArgumentResol
 import org.springframework.web.reactive.result.view.ViewResolver;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
+import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.encoder.LogstashEncoder;
 
 @Slf4j
 @SpringBootApplication
@@ -49,7 +47,8 @@ import java.util.Properties;
 public class ApiGatewayApplication {
 
     public static void main(String[] args) {
-        log.info("Started and logstash is loaded and its name is " + LogstashEncoder.class.getSimpleName());
+        log.info("Started and logstash is loaded and its name is "
+                + LogstashEncoder.class.getSimpleName());
         SpringApplication.run(ApiGatewayApplication.class, args);
     }
 
@@ -57,19 +56,23 @@ public class ApiGatewayApplication {
     public ApplicationRunner afterAppStarted() {
         return args -> {
             // Read Yaml and get ready to resolve values
-            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            PathMatchingResourcePatternResolver resolver =
+                    new PathMatchingResourcePatternResolver();
 
-            File file = resolver.getResource("classpath:static/assets/assets/config.yaml").getFile();
+            File file =
+                    resolver.getResource("classpath:static/assets/assets/config.yaml").getFile();
             YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
             factory.setResources(new PathResource(file.toPath()));
             factory.afterPropertiesSet();
 
             Properties applicationProperties = factory.getObject();
 
-            PropertiesPropertySource ps = new PropertiesPropertySource("configProperties", Objects.requireNonNull(applicationProperties));
+            PropertiesPropertySource ps = new PropertiesPropertySource("configProperties",
+                    Objects.requireNonNull(applicationProperties));
             StandardEnvironment env = new StandardEnvironment();
             env.getPropertySources().addFirst(ps);
-            env.getPropertySources().addFirst(new SimpleCommandLinePropertySource(args.getSourceArgs()));
+            env.getPropertySources()
+                    .addFirst(new SimpleCommandLinePropertySource(args.getSourceArgs()));
             String[] properties = ps.getPropertyNames();
 
             // Resolve properties values
@@ -94,24 +97,20 @@ public class ApiGatewayApplication {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @Qualifier("corsConfigurer")
     public WebFluxConfigurer corsConfigurer(WebProperties webProperties,
-                                            WebFluxProperties webFluxProperties,
-                                            ListableBeanFactory beanFactory,
-                                            ObjectProvider<HandlerMethodArgumentResolver> resolvers,
-                                            ObjectProvider<CodecCustomizer> codecCustomizers,
-                                            ObjectProvider<ResourceHandlerRegistrationCustomizer> resourceHandlerRegistrationCustomizer,
-                                            ObjectProvider<ViewResolver> viewResolvers) {
-        return new WebFluxAutoConfiguration.WebFluxConfig(webProperties,
-                webFluxProperties,
-                beanFactory,
-                resolvers,
-                codecCustomizers,
-                resourceHandlerRegistrationCustomizer,
+            WebFluxProperties webFluxProperties, ListableBeanFactory beanFactory,
+            ObjectProvider<HandlerMethodArgumentResolver> resolvers,
+            ObjectProvider<CodecCustomizer> codecCustomizers,
+            ObjectProvider<ResourceHandlerRegistrationCustomizer> resourceHandlerRegistrationCustomizer,
+            ObjectProvider<ViewResolver> viewResolvers) {
+        return new WebFluxAutoConfiguration.WebFluxConfig(webProperties, webFluxProperties,
+                beanFactory, resolvers, codecCustomizers, resourceHandlerRegistrationCustomizer,
                 viewResolvers) {
 
             @Override
-            public void addCorsMappings(@NonNull CorsRegistry registry) {
+            public void addCorsMappings(CorsRegistry registry) {
 
-                registry.addMapping("/**").allowedOriginPatterns(Constant.ALLOWED_ORIGIN_PATTERNS.get())
+                registry.addMapping("/**")
+                        .allowedOriginPatterns(Constant.ALLOWED_ORIGIN_PATTERNS.get())
                         .allowedMethods(HttpMethod.GET.name(), HttpMethod.OPTIONS.name());
             }
         };
@@ -122,8 +121,11 @@ public class ApiGatewayApplication {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(List.of(Constant.ALLOWED_ORIGIN_PATTERNS.get()));
         corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.OPTIONS.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.DELETE.name()));
-        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfiguration
+                .setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.OPTIONS.name(),
+                        HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.DELETE.name()));
+        UrlBasedCorsConfigurationSource corsConfigurationSource =
+                new UrlBasedCorsConfigurationSource();
         corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
         return new CorsWebFilter(corsConfigurationSource);
     }

@@ -41,11 +41,7 @@ class VisitResource {
     }
 
     @GetMapping("pets/visits")
-    public Visits read(@RequestParam("petId") List<Integer> petIds) {
-        return new Visits(visitRepository.findByPetIdIn(petIds));
+    public List<Visit> read(@RequestParam("petId") List<Integer> petIds) {
+        return visitRepository.findByPetIdIn(petIds);
     }
-
-    record Visits(List<Visit> items) {
-    }
-
 }

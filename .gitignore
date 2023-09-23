@@ -49,3 +49,9 @@ local.properties
 
 # Generated files
 /README.html
+
+# VScode
+.history
+
+# MacOS
+.DS_Store

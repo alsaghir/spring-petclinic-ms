@@ -16,7 +16,7 @@ import org.springframework.samples.petclinic.customer.domain.shared.DomainError;
 import org.springframework.samples.petclinic.customer.domain.shared.DomainException;
 import org.springframework.samples.petclinic.customer.domain.tables.PetType;
 import org.springframework.stereotype.Service;
-
+import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,12 +46,16 @@ public class PetService {
                 .fetch());
     }
 
-    public PetData createPet(Integer ownerId, PetCommand petCommand) {
+    public PetData createPet(Integer ownerId, @Nullable Integer petId, PetCommand petCommand) {
         final Optional<Owner> optionalOwner = ownerRepository.findById(ownerId);
         Owner owner = optionalOwner.orElseThrow(() -> new DomainException("Owner with id [" + ownerId + "] not found", DomainError.RESOURCE_NOT_FOUND));
 
-        final Pet pet = new Pet();
-        owner.add(pet);
+
+        final Pet pet = petId == null ? new Pet() : 
+        petRepository.findById(petId).orElseThrow(() -> new DomainException("Pet with id [" + petId + "] not found", DomainError.RESOURCE_NOT_FOUND));
+        
+        if(petId == null)
+            owner.add(pet);
         pet.setName(petCommand.name());
         pet.setBirthDate(petCommand.birthDate());
 

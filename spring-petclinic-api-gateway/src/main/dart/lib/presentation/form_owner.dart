@@ -41,17 +41,16 @@ class NewOwnerScreenState extends ConsumerState<NewOwnerScreen> {
   final _cityController = TextEditingController();
   final _telephoneController = TextEditingController();
 
-  final StateProvider<bool> loadingProvider =
+  final StateProvider<bool> loadingSubmitFormProvider =
       StateProvider<bool>((ref) => false);
 
   @override
   Widget build(BuildContext context) {
     final config = ref.watch(configProvider);
     final dio = ref.watch(httpClientProvider);
-    final isLoading = ref.watch(loadingProvider);
+    final isLoading = ref.watch(loadingSubmitFormProvider);
     AsyncValue<Owner?> ownerForEdit =
         ref.watch(ownerToEditProvider(widget.ownerId));
-    print(ownerForEdit.value?.toJson());
 
     useEffect(() {
       if (ownerForEdit.value != null) {
@@ -66,7 +65,7 @@ class NewOwnerScreenState extends ConsumerState<NewOwnerScreen> {
 
     return ownerForEdit.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stackTrace) => Text("Error while fetching owner"),
+      error: (error, stackTrace) => const Text("Error while fetching owner"),
       data: (loadedOwner) {
         return Scaffold(
           appBar: AppBar(
@@ -176,15 +175,18 @@ class NewOwnerScreenState extends ConsumerState<NewOwnerScreen> {
                                 ? null
                                 : () async {
                                     if (_formKey.currentState!.validate()) {
-                                      ref.read(loadingProvider.notifier).state =
-                                          true;
+                                      ref
+                                          .read(loadingSubmitFormProvider
+                                              .notifier)
+                                          .state = true;
                                       var owner = Owner(
                                           id: loadedOwner?.id,
                                           firstName: _firstNameController.text,
                                           lastName: _lastNameController.text,
                                           address: _addressController.text,
                                           city: _cityController.text,
-                                          telephone: _telephoneController.text);
+                                          telephone: _telephoneController.text,
+                                          pets: List.empty());
                                       Response response;
                                       try {
                                         if (loadedOwner == null) {
@@ -216,7 +218,8 @@ class NewOwnerScreenState extends ConsumerState<NewOwnerScreen> {
                                         print(err);
                                       } finally {
                                         ref
-                                            .read(loadingProvider.notifier)
+                                            .read(loadingSubmitFormProvider
+                                                .notifier)
                                             .state = false;
                                       }
                                     }

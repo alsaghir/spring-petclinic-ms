@@ -28,17 +28,37 @@ class Commons {
       ),
     );
   }
-
 }
 
 @immutable
 class Config {
-  const Config({required this.kBackendHost, required this.kOwnersApi});
+  const Config({
+    required this.kBackendHost,
+    required this.kOwnersApi,
+    required this.kPetsVisitsApi,
+    required this.kPetTypesApi,
+    required this.kOwnersPetsApi,
+  });
 
   final String kBackendHost;
   final String kOwnersApi;
+  final String kPetsVisitsApi;
+  final String kPetTypesApi;
+  final String kOwnersPetsApi;
 
   String ownersEndpoint() {
     return kBackendHost + kOwnersApi;
+  }
+
+  String petsVisitsApiEndpoint() {
+    return kBackendHost + kPetsVisitsApi;
+  }
+
+  String petTypesApiEndpoint() {
+    return kBackendHost + kPetTypesApi;
+  }
+
+  String ownersPetsApiEndpoint() {
+    return kBackendHost + kOwnersPetsApi;
   }
 }
