@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -52,21 +51,18 @@ class NewOwnerScreenState extends ConsumerState<NewOwnerScreen> {
     AsyncValue<Owner?> ownerForEdit =
         ref.watch(ownerToEditProvider(widget.ownerId));
 
-    useEffect(() {
-      if (ownerForEdit.value != null) {
-        _firstNameController.text = ownerForEdit.value!.firstName;
-        _lastNameController.text = ownerForEdit.value!.lastName;
-        _addressController.text = ownerForEdit.value!.address;
-        _cityController.text = ownerForEdit.value!.city;
-        _telephoneController.text = ownerForEdit.value!.telephone;
-      }
-      return null;
-    });
-
     return ownerForEdit.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) => const Text("Error while fetching owner"),
       data: (loadedOwner) {
+        if (loadedOwner != null && _firstNameController.text.isEmpty) {
+          _firstNameController.text = loadedOwner.firstName;
+          _lastNameController.text = loadedOwner.lastName;
+          _addressController.text = loadedOwner.address;
+          _cityController.text = loadedOwner.city;
+          _telephoneController.text = loadedOwner.telephone;
+        }
+
         return Scaffold(
           appBar: AppBar(
             centerTitle: false,
@@ -210,8 +206,8 @@ class NewOwnerScreenState extends ConsumerState<NewOwnerScreen> {
                                               .read(ownersNotifierProvider
                                                   .notifier)
                                               .fetchAllOwners();
+                                          ref.invalidate(ownerProvider);
                                           if (!context.mounted) return;
-                                          print("about to pop");
                                           GoRouter.of(context).pop();
                                         }
                                       } catch (err) {

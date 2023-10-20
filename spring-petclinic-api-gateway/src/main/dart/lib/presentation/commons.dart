@@ -37,6 +37,7 @@ class Config {
     required this.kOwnersApi,
     required this.kPetsVisitsApi,
     required this.kPetTypesApi,
+    required this.kVisitsOwnersApi,
     required this.kOwnersPetsApi,
   });
 
@@ -44,6 +45,7 @@ class Config {
   final String kOwnersApi;
   final String kPetsVisitsApi;
   final String kPetTypesApi;
+  final String kVisitsOwnersApi;
   final String kOwnersPetsApi;
 
   String ownersEndpoint() {
@@ -60,5 +62,9 @@ class Config {
 
   String ownersPetsApiEndpoint() {
     return kBackendHost + kOwnersPetsApi;
+  }
+
+  String visitsOwnersEndpoint() {
+    return kBackendHost + kVisitsOwnersApi;
   }
 }

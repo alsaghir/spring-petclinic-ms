@@ -36,7 +36,6 @@ final AutoDisposeFutureProviderFamily<Pet?, OwnerPet> petToEditProvider =
     Response<Map<String, dynamic>> response = await httpClient.get(
         "${conf.ownersPetsApiEndpoint()}/${ownerPet.ownerId}/pets/${ownerPet.petId}",
         options: Options(contentType: Headers.jsonContentType));
-    print(response);
     return Pet.from(response.data as Map<String, dynamic>);
   });
 });
@@ -87,15 +86,12 @@ class FormPetScreenState extends ConsumerState<FormPetScreen> {
         error: (error, stackTrace) =>
             const Text("Error while fetching pet types"),
         data: (loadedPetTypes) {
-          useEffect(() {
-            if (petData != null) {
-              _nameController.text = petData.name;
-              _dateController.text = petData.birthDate;
-              _typeController.selectedPetType =
-                  loadedPetTypes.firstWhere((pt) => pt.id == petData.typeId);
-            }
-            return null;
-          });
+          if (petData != null && _nameController.text.isEmpty) {
+            _nameController.text = petData.name;
+            _dateController.text = petData.birthDate;
+            _typeController.selectedPetType =
+                loadedPetTypes.firstWhere((pt) => pt.id == petData.typeId);
+          }
 
           return Scaffold(
             appBar: AppBar(
@@ -237,7 +233,6 @@ class FormPetScreenState extends ConsumerState<FormPetScreen> {
                                             ref.invalidate(
                                                 ownerProvider(widget.ownerId));
                                             if (!context.mounted) return;
-                                            print("about to pop");
                                             GoRouter.of(context).pop();
                                           }
                                         } catch (err) {

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:yaml/yaml.dart';
 
@@ -31,6 +30,7 @@ final asyncConfigProvider = FutureProvider<Config>((ref) async {
       kOwnersApi: yamlMap['api.owners'],
       kPetsVisitsApi: yamlMap['api.pets.visits'],
       kOwnersPetsApi: yamlMap['api.owners.pets'],
+      kVisitsOwnersApi: yamlMap['api.visits.owners'],
       kPetTypesApi: yamlMap['api.pet.types']);
 
   return config;

@@ -5,7 +5,7 @@ import 'package:petclinicui/presentation/form_pet.dart';
 import 'package:petclinicui/presentation/owner_details.dart';
 
 import 'conf/providers.dart';
-import 'form_visit.dart';
+import 'presentation/form_visit.dart';
 import 'presentation/app_screen.dart';
 import 'presentation/commons.dart';
 import 'presentation/home.dart';
@@ -85,8 +85,10 @@ class MyApp extends HookConsumerWidget {
                     GoRoute(
                       name: 'addVisit',
                       path: 'pets/:petId/visits/new',
-                      builder: (context, state) => const AppScreen(
-                        tabContent: FormVisitScreen(),
+                      builder: (context, state) => AppScreen(
+                        tabContent: FormVisitScreen(
+                            ownerId: int.parse(state.params['id']!),
+                            petId: int.parse(state.params['petId']!)),
                       ),
                     ),
                   ]),

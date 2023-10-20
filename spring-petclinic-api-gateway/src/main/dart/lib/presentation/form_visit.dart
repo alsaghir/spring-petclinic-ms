@@ -1,12 +1,19 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../conf/providers.dart';
+import '../domain/visit.dart';
+
 /// https://docs.flutter.dev/cookbook/forms
 class FormVisitScreen extends StatefulHookConsumerWidget {
-  const FormVisitScreen({super.key});
+  const FormVisitScreen(
+      {required this.ownerId, required this.petId, super.key});
+
+  final int ownerId;
+  final int petId;
 
   @override
   FormVisitScreenState createState() => FormVisitScreenState();
@@ -22,6 +29,8 @@ class FormVisitScreenState extends ConsumerState<FormVisitScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final config = ref.watch(configProvider);
+    final dio = ref.watch(httpClientProvider);
     final isLoading = ref.watch(loadingSubmitFormProvider);
 
     return Scaffold(
@@ -58,11 +67,11 @@ class FormVisitScreenState extends ConsumerState<FormVisitScreen> {
                     CustomListTile(
                       nameController: _descriptionController,
                       validator: (value) => value == null || value.isEmpty
-                          ? "Pet name is required"
+                          ? "Description is required"
                           : null,
-                      labelText: 'Pet Name',
-                      hintText: 'Enter name of the pet...',
-                      icon: const Icon(Icons.pets),
+                      labelText: 'Description',
+                      hintText: 'Enter Description...',
+                      icon: const Icon(Icons.text_snippet_outlined),
                       textInputType: TextInputType.name,
                     ),
                     const SizedBox(height: 16.0),
@@ -85,8 +94,8 @@ class FormVisitScreenState extends ConsumerState<FormVisitScreen> {
                             initialEntryMode: DatePickerEntryMode.calendarOnly,
                             initialDatePickerMode: DatePickerMode.day,
                             initialDate: DateTime.now(),
-                            firstDate: DateTime(1960),
-                            lastDate: DateTime.now());
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(DateTime.now().year + 1));
 
                         if (date == null) return;
 
@@ -109,6 +118,38 @@ class FormVisitScreenState extends ConsumerState<FormVisitScreen> {
                                   ref
                                       .read(loadingSubmitFormProvider.notifier)
                                       .state = true;
+
+                                  var visit = Visit(
+                                      id: null,
+                                      description: _descriptionController.text,
+                                      visitDate: _dateController.text,
+                                      petId: widget.petId);
+
+                                  Response response;
+
+                                  try {
+                                    response = await dio.post(
+                                        "${config!.visitsOwnersEndpoint()}/${widget.ownerId}/pets/${widget.petId}/visits",
+                                        data: visit.toJson(),
+                                        options: Options(
+                                            contentType:
+                                                Headers.jsonContentType));
+
+                                    if (response.statusCode == 201 ||
+                                        response.statusCode == 204) {
+                                      ref.invalidate(
+                                          visitsProvider(widget.ownerId));
+                                      if (!context.mounted) return;
+                                      GoRouter.of(context).pop();
+                                    }
+                                  } catch (err) {
+                                    print(err);
+                                  } finally {
+                                    ref
+                                        .read(
+                                            loadingSubmitFormProvider.notifier)
+                                        .state = false;
+                                  }
                                 }
                               },
                         icon: !isLoading

@@ -1,5 +1,6 @@
 api.owners: '/api/customer/owners'
-api.pets.visits: '/api/visit/pets/visits'
 api.pet.types: '/api/customer/petTypes'
 api.owners.pets: '/api/customer/owners'
+api.pets.visits: '/api/visit/pets/visits'
+api.visits.owners: '/api/visit/owners'
 backend.host: 'http://localhost:7778'
