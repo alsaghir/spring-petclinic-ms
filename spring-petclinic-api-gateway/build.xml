@@ -18,7 +18,7 @@
               executable="powershell.exe"
               resultproperty="serialNumber"
               failonerror="true">
-            <arg line="-Command flutter build web --web-renderer html"/>
+            <arg line="-Command flutter build web"/>
             <echo level="info" message="Flutter app build on Windows is successful"/>
         </exec>
 
@@ -28,13 +28,13 @@
               resultproperty="serialNumber"
               failonerror="true">
             <arg line="-c"/>
-            <arg line="'flutter build web --web-renderer html'"/>
+            <arg line="'flutter clean; flutter build web'"/>
         </exec>
         <echo level="info" message="Flutter app build on *nix is successful"/>
     </target>
 
     <target name="copy-flutter-output">
-        <copy todir="${target.location}" failonerror="true">
+        <copy todir="${target.location}" failonerror="true" overwrite="true" force="true" verbose="true">
             <fileset dir="${build.location}"/>
         </copy>
         <echo level="info" message="Flutter copy build is successful"/>

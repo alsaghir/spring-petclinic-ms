@@ -53,7 +53,7 @@ class MyApp extends HookConsumerWidget {
                 path: 'edit/:id',
                 builder: (context, state) => AppScreen(
                   tabContent:
-                      NewOwnerScreen(ownerId: int.parse(state.params['id']!)),
+                      NewOwnerScreen(ownerId: int.parse(state.pathParameters['id']!)),
                 ),
               ),
               GoRoute(
@@ -61,7 +61,7 @@ class MyApp extends HookConsumerWidget {
                   path: ':id',
                   builder: (context, state) => AppScreen(
                         tabContent: OwnerDetailsScreen(
-                            ownerId: int.parse(state.params['id']!)),
+                            ownerId: int.parse(state.pathParameters['id']!)),
                       ),
                   routes: <GoRoute>[
                     GoRoute(
@@ -69,7 +69,7 @@ class MyApp extends HookConsumerWidget {
                       path: 'pets',
                       builder: (context, state) => AppScreen(
                         tabContent: FormPetScreen(
-                            ownerId: int.parse(state.params['id']!),
+                            ownerId: int.parse(state.pathParameters['id']!),
                             petId: null),
                       ),
                     ),
@@ -78,8 +78,8 @@ class MyApp extends HookConsumerWidget {
                       path: 'pets/:petId',
                       builder: (context, state) => AppScreen(
                         tabContent: FormPetScreen(
-                            ownerId: int.parse(state.params['id']!),
-                            petId: int.parse(state.params['petId']!)),
+                            ownerId: int.parse(state.pathParameters['id']!),
+                            petId: int.parse(state.pathParameters['petId']!)),
                       ),
                     ),
                     GoRoute(
@@ -87,8 +87,8 @@ class MyApp extends HookConsumerWidget {
                       path: 'pets/:petId/visits/new',
                       builder: (context, state) => AppScreen(
                         tabContent: FormVisitScreen(
-                            ownerId: int.parse(state.params['id']!),
-                            petId: int.parse(state.params['petId']!)),
+                            ownerId: int.parse(state.pathParameters['id']!),
+                            petId: int.parse(state.pathParameters['petId']!)),
                       ),
                     ),
                   ]),
@@ -114,6 +114,7 @@ class MyApp extends HookConsumerWidget {
         error: (error, stackTrace) => Text(error.toString()),
         loading: () => const Center(child: CircularProgressIndicator()),
         data: (data) => MaterialApp.router(
+          theme: ThemeData.light(useMaterial3: false),
               debugShowCheckedModeBanner: false,
               routerConfig: router,
               title: "Pet Clinic App",

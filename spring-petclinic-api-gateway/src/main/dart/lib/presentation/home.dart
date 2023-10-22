@@ -1,14 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/link.dart';
+import 'package:go_router/go_router.dart';
 
-import '../presentation/commons.dart';
+import 'constants.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final routes = Constants.kTabs;
     return Scaffold(
-      appBar: Commons.appBar(),
+      appBar: AppBar(
+        title: const Center(
+          child: Text('Petclinic'),
+        ),
+        actions: List<Widget>.generate(
+          routes.length,
+              (index) => Link(
+            uri: Uri.parse(routes[index].routeName),
+            builder: (context, followLink) => ElevatedButton(
+              autofocus: GoRouterState.of(context).uri.toString().substring(1) ==
+                  routes[index].routeName
+                  ? true
+                  : false,
+              onPressed: () =>
+                  GoRouter.of(context).goNamed(routes[index].routeName),
+              child: Text(routes[index].tabName),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Center(
             child: Padding(

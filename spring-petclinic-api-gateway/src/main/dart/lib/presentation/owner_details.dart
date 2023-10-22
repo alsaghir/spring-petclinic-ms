@@ -31,10 +31,6 @@ class OwnerDetailsScreen extends HookConsumerWidget {
                 pet.id!: visits.where((v) => pet.id == v.petId).toList(),
             };
 
-            // TODO
-            // handle visits
-            //
-
             return Scaffold(
               appBar: AppBar(
                 centerTitle: false,
@@ -125,7 +121,7 @@ class OwnerDetailsScreen extends HookConsumerWidget {
                                     onPressed: () {
                                       GoRouter.of(context).pushNamed(
                                           "editOwner",
-                                          params: {"id": "$ownerId"});
+                                          pathParameters: {"id": "$ownerId"});
                                     },
                                     child: const Text(
                                       'Edit Owner',
@@ -140,7 +136,7 @@ class OwnerDetailsScreen extends HookConsumerWidget {
                                         padding: const EdgeInsets.all(20)),
                                     onPressed: () {
                                       GoRouter.of(context).pushNamed("addPet",
-                                          params: {"id": "$ownerId"});
+                                          pathParameters: {"id": "$ownerId"});
                                     },
                                     child: const Text(
                                       'Add New Pet',
@@ -244,7 +240,7 @@ class OwnerDetailsScreen extends HookConsumerWidget {
                                                       GoRouter.of(context)
                                                           .namedLocation(
                                                               "editPet",
-                                                              params: {
+                                                          pathParameters: {
                                                         "id": "$ownerId",
                                                         "petId":
                                                             "${owner.pets[petIndex].id}"
@@ -256,13 +252,13 @@ class OwnerDetailsScreen extends HookConsumerWidget {
                                                     onPressed: () {
                                                       GoRouter.of(context)
                                                           .pushNamed("editPet",
-                                                              params: {
+                                                          pathParameters: {
                                                             "id": "$ownerId",
                                                             "petId":
                                                                 "${owner.pets[petIndex].id}"
                                                           });
                                                     },
-                                                    child: Text("Edit Pet"),
+                                                    child: const Text("Edit Pet"),
                                                   ),
                                                 ),
                                                 const SizedBox(
@@ -273,7 +269,7 @@ class OwnerDetailsScreen extends HookConsumerWidget {
                                                       GoRouter.of(context)
                                                           .namedLocation(
                                                               "addVisit",
-                                                              params: {
+                                                          pathParameters: {
                                                         "id": "$ownerId",
                                                         "petId":
                                                             "${owner.pets[petIndex].id}"
@@ -285,13 +281,13 @@ class OwnerDetailsScreen extends HookConsumerWidget {
                                                     onPressed: () {
                                                       GoRouter.of(context)
                                                           .pushNamed("addVisit",
-                                                              params: {
+                                                          pathParameters: {
                                                             "id": "$ownerId",
                                                             "petId":
                                                                 "${owner.pets[petIndex].id}"
                                                           });
                                                     },
-                                                    child: Text("Add Visit"),
+                                                    child: const Text("Add Visit"),
                                                   ),
                                                 ),
                                               ],

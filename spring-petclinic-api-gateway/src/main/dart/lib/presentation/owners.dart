@@ -1,17 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/link.dart';
 
 import '../domain/owner_repo.dart';
-import 'commons.dart';
+import 'constants.dart';
 
 class OwnersScreen extends HookConsumerWidget {
   const OwnersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final routes = Constants.kTabs;
     return Scaffold(
-      appBar: Commons.appBar(),
+      appBar: AppBar(
+        title: const Center(
+          child: Text('Petclinic'),
+        ),
+        actions: List<Widget>.generate(
+          routes.length,
+              (index) => Link(
+            uri: Uri.parse(routes[index].routeName),
+            builder: (context, followLink) => ElevatedButton(
+              autofocus: GoRouterState.of(context).uri.toString().substring(1) ==
+                  routes[index].routeName
+                  ? true
+                  : false,
+              onPressed: () =>
+                  GoRouter.of(context).goNamed(routes[index].routeName),
+              child: Text(routes[index].tabName),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -107,7 +128,7 @@ class OwnersListWidget extends HookConsumerWidget {
                   IconButton(
                       onPressed: () {
                         GoRouter.of(context).goNamed("editOwner",
-                            params: {"id": "${owners[index].id}"});
+                            pathParameters: {"id": "${owners[index].id}"});
                       },
                       icon: const Icon(
                         Icons.edit,
@@ -117,7 +138,7 @@ class OwnersListWidget extends HookConsumerWidget {
                   IconButton(
                       onPressed: () {
                         GoRouter.of(context).goNamed("viewOwner",
-                            params: {"id": "${owners[index].id}"});
+                            pathParameters: {"id": "${owners[index].id}"});
                       },
                       icon: const Icon(
                         Icons.preview,

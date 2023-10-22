@@ -16,7 +16,7 @@ class Commons {
         (index) => Link(
           uri: Uri.parse(routes[index].routeName),
           builder: (context, followLink) => ElevatedButton(
-            autofocus: GoRouter.of(context).location.substring(1) ==
+            autofocus: GoRouterState.of(context).uri.toString().substring(1) ==
                     routes[index].routeName
                 ? true
                 : false,

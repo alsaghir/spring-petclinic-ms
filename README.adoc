@@ -15,7 +15,7 @@
 [[intro]]
 == Intro
 
-This is distributed version of the Spring Pet Clinic Sample app built with Spring & Flutter Web. These microservices fork initially inspired by [`spring-petclinic-microservices`](https://github.com/spring-petclinic/spring-petclinic-microservices) to demonstrate how to split sample Spring application into microservices. Multiple technologies are considered for this demonstration which are
+This is distributed version of the Spring Pet Clinic Sample app built with Spring & Flutter Web. These microservices fork initially inspired by https://github.com/spring-petclinic/spring-petclinic-microservices[spring-petclinic-microservices] to demonstrate how to split sample Spring application into microservices. Multiple technologies are considered for this demonstration which are
 
 * Java 17 & Maven with 3rd party libraries (Lombok, Mapstruct, JOOQ, Flyway, Micrometer)
 * Spring Boot (Web, Data JPA, Admin Server)
@@ -35,12 +35,20 @@ As this is still work in progress, there are multiple stages to be done for a co
 * Implementation
   * Add custom labels and tags to prometheus and loki usage
   * Data initialization for vets and visits services
-  * Complete front-end implementation
+  * Vets and error front-end implementation
   * Include chaos (not final)
   * Unit tests
   * CI/CD Tool  (not final)
+  * Default data
+  * Spring security
+  * Keycloak
+  * Unit test
+  * Ui end-to-end test
+  * Code optimization
+  * Jlink or artifact and runtime optimization and graalvm
+  * Java 21 and version upgrade
 * Documentation and architecture showcase
-  * Architecture doc
+  * [line-through]#Architecture doc# * done
   * [line-through]#Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)# * done
   * [line-through]#Commands for starting services locally using docker desktop with docker being target platform# * done
   * Commands for starting services locally using docker-compose
@@ -54,6 +62,10 @@ As this is still work in progress, there are multiple stages to be done for a co
 * [line-through]#All services to be up and running using docker with and without local SDK# * done
 * All services to be up and running using docker compose
 * Unified files as source of commands to start commands without typing and test on Windows & MacOS
+
+== Architecture
+
+image::./doc/Architecture.png[]
 
 == Start services locally
 
@@ -89,6 +101,7 @@ mvn -pl spring-petclinic-discovery-server clean spring-boot:run
 mvn -pl spring-petclinic-admin-server clean spring-boot:run
 mvn -pl spring-petclinic-api-gateway clean spring-boot:run
 mvn -pl spring-petclinic-customer-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2"
+mvn -pl spring-petclinic-visits-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2"
 
 # Install browser to be used for testing
 export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
@@ -150,6 +163,7 @@ docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t sprin
 docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-discovery-server --build-arg SERVICE_NAME=spring-petclinic-discovery-server .
 docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-admin-server --build-arg SERVICE_NAME=spring-petclinic-admin-server .
 docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-customer-service --build-arg SERVICE_NAME=spring-petclinic-customer-service .
+docker buildx build --progress=plain -f ./docker/spring-boot/Dockerfile -t spring-petclinic-visits-service --build-arg SERVICE_NAME=spring-petclinic-visits-service .
 docker buildx build --progress=plain -f ./docker/flutter-api-gateway/Dockerfile -t spring-petclinic-api-gateway --build-arg SERVICE_NAME=spring-petclinic-api-gateway .
 
 # Manipulate some runtime configurations
@@ -161,6 +175,7 @@ docker container run -d --name=config-server --network MyBridgeNetwork -p 7771:7
 docker container run -d --name=discovery-server --network MyBridgeNetwork -p 7772:7772 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ spring-petclinic-discovery-server
 docker container run -d --name=admin-server --network MyBridgeNetwork -p 7776:7776 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server spring-petclinic-admin-server
 docker container run -d --name=customers-service --network MyBridgeNetwork -p 7773:7773 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env H2HOST=h2-server --env H2PORT=1521 --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env SPRING_PROFILES_ACTIVE=default,h2 spring-petclinic-customer-service
+docker container run -d --name=visits-service --network MyBridgeNetwork -p 7775:7775 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env H2HOST=h2-server --env H2PORT=1521 --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env SPRING_PROFILES_ACTIVE=default,h2 spring-petclinic-visits-service
 docker container run -d --name=api-gateway --network MyBridgeNetwork -p 7778:7778 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env BACKEND_HOST=http://localhost:7778 spring-petclinic-api-gateway
 
 # Validate everything is working correctly by running
