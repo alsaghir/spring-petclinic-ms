@@ -181,8 +181,15 @@ docker container run -d --name=api-gateway --network MyBridgeNetwork -p 7778:777
 # Validate everything is working correctly by running
 # the test service and open spring-petclinic-test-service/target/site/index.html
 # in a browser
-docker run --name=firefox -d --network MyBridgeNetwork -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-firefox:latest
-docker container run --name=test --network MyBridgeNetwork --rm -v $(PWD):/opt/app -v m2:/root/.m2 -e BROWSER_HOST=firefox maven:3-eclipse-temurin-17-alpine /bin/sh -c 'cd /opt/app && mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE'
+# Install browser to be used for testing
+export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+export DEBUG=pw:browser
+mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -pl spring-petclinic-test-service -D exec.args="install firefox"
+
+# Validate everything is working correctly by running
+# the test service and open spring-petclinic-test-service/target/site/index.html
+# in a browser
+mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE -Dglobal.host=localhost
 ----
 
 .Services Locations
