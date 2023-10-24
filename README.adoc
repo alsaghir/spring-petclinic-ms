@@ -34,6 +34,7 @@ As this is still work in progress, there are multiple stages to be done for a co
 
 * TODO
   * docker-compose
+  * Monitoring verification
   * Add custom labels and tags to prometheus and loki usage
   * Data initialization for vets and visits services
   * Vets and error front-end implementation
