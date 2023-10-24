@@ -32,7 +32,8 @@ This is distributed version of the Spring Pet Clinic Sample app built with Sprin
 
 As this is still work in progress, there are multiple stages to be done for a complete demonstration.
 
-* Implementation
+* TODO
+  * docker-compose
   * Add custom labels and tags to prometheus and loki usage
   * Data initialization for vets and visits services
   * Vets and error front-end implementation
@@ -45,23 +46,22 @@ As this is still work in progress, there are multiple stages to be done for a co
   * Unit test
   * Ui end-to-end test
   * Code optimization
+  * Modularity support
   * Jlink or artifact and runtime optimization and graalvm
   * Java 21 and version upgrade
-* Documentation and architecture showcase
-  * [line-through]#Architecture doc# * done
-  * [line-through]#Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)# * done
-  * [line-through]#Commands for starting services locally using docker desktop with docker being target platform# * done
-  * Commands for starting services locally using docker-compose
+  * Unified files as source of commands to start commands without typing and test on Windows & MacOS
+* Done
+  * [line-through]#Architecture doc#
+  * [line-through]#Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)#
+  * [line-through]#Commands for starting services locally using docker desktop with docker being target platform#
 * All services to be up and running locally with default configuration
-  * [line-through]#Make sure JOOQ generation of classes done automatically# * done
-  * [line-through]#Generate external config for Observability and tracing for plug & play# * done
-  * [line-through]#Validate functionality of Grafana# * done
+  * [line-through]#Make sure JOOQ generation of classes done automatically#
+  * [line-through]#Generate external config for Observability and tracing for plug & play#
+  * [line-through]#Validate functionality of Grafana#
   * Custom Labels in Grafana for prometheus and loki
-* [line-through]#Create separate module for testing all the up and running service automating that everything is up and running as expected# * done
-* [line-through]#All services to be up and running locally# * done
-* [line-through]#All services to be up and running using docker with and without local SDK# * done
-* All services to be up and running using docker compose
-* Unified files as source of commands to start commands without typing and test on Windows & MacOS
+* [line-through]#Create separate module for testing all the up and running service automating that everything is up and running as expected#
+* [line-through]#All services to be up and running locally#
+* [line-through]#All services to be up and running using docker with and without local SDK#
 
 == Architecture
 
