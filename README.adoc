@@ -33,7 +33,7 @@ This is distributed version of the Spring Pet Clinic Sample app built with Sprin
 As this is still work in progress, there are multiple stages to be done for a complete demonstration.
 
 * TODO
-  * docker-compose
+  * python script for command line interacting
   * Monitoring verification
   * Add custom labels and tags to prometheus and loki usage
   * Data initialization for vets and visits services
@@ -51,7 +51,9 @@ As this is still work in progress, there are multiple stages to be done for a co
   * Jlink or artifact and runtime optimization and graalvm
   * Java 21 and version upgrade
   * Unified files as source of commands to start commands without typing and test on Windows & MacOS
+  * e2e testing from separated docker container
 * Done
+  * [line-through]#Docker Compose#
   * [line-through]#Architecture doc#
   * [line-through]#Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)#
   * [line-through]#Commands for starting services locally using docker desktop with docker being target platform#
@@ -140,9 +142,23 @@ mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validatio
 
 * Docker >= 24.0.2
 
-=== Info
+=== Compose
 
-* Run the following to start database and observability services.(Note: In windows PowerShell replace `$(PWD)` with `$+{PWD}+`)
+[source,bash]
+----
+# Build the images
+docker compose -f docker-compose.yml build
+
+# Run all
+docker compose -f docker-compose.yml up
+
+# Shutdown and remove resources
+docker compose -f docker-compose.yml down
+----
+
+=== Manually
+
+* Run the following to start services, database and observability services.(Note: In windows PowerShell replace `$(PWD)` with `$+{PWD}+`)
 
 [source,bash]
 ----
@@ -178,19 +194,6 @@ docker container run -d --name=admin-server --network MyBridgeNetwork -p 7776:77
 docker container run -d --name=customers-service --network MyBridgeNetwork -p 7773:7773 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env H2HOST=h2-server --env H2PORT=1521 --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env SPRING_PROFILES_ACTIVE=default,h2 spring-petclinic-customer-service
 docker container run -d --name=visits-service --network MyBridgeNetwork -p 7775:7775 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env H2HOST=h2-server --env H2PORT=1521 --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env SPRING_PROFILES_ACTIVE=default,h2 spring-petclinic-visits-service
 docker container run -d --name=api-gateway --network MyBridgeNetwork -p 7778:7778 -v logVolume:/workspace/app/log --env CONFIG_SERVER_URL=http://config-server:7771/ --env DISCOVERY_SERVER_HOST=discovery-server --env ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans --env BACKEND_HOST=http://localhost:7778 spring-petclinic-api-gateway
-
-# Validate everything is working correctly by running
-# the test service and open spring-petclinic-test-service/target/site/index.html
-# in a browser
-# Install browser to be used for testing
-export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-export DEBUG=pw:browser
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -pl spring-petclinic-test-service -D exec.args="install firefox"
-
-# Validate everything is working correctly by running
-# the test service and open spring-petclinic-test-service/target/site/index.html
-# in a browser
-mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE -Dglobal.host=localhost
 ----
 
 .Services Locations
@@ -209,3 +212,29 @@ mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validatio
 | Prometheus | http://localhost:9090
 | Loki | http://localhost:3100/metrics
 |===
+
+== Plus
+
+=== Testing
+
+* `spring-petclinic-test-service` responsible for testing the functionality running within other services. Typically, this is via calling APIs and verify the responses or simply simulating user experience.
+  * https://junit.org/junit5/[Junit 5]
+  * https://docs.spring.io/spring-framework/reference/testing/webtestclient.html[WebTestClient]
+  * https://playwright.dev/[Playwright]
+  * https://github.com/json-path/JsonPath[JsonPath]
+
+[source,bash]
+----
+# Validate everything is working correctly by running
+# the test service and open spring-petclinic-test-service/target/site/index.html
+# in a browser
+# Install browser to be used for testing
+export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+export DEBUG=pw:browser
+mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -pl spring-petclinic-test-service -D exec.args="install firefox"
+
+# Validate everything is working correctly by running
+# the test service and open spring-petclinic-test-service/target/site/index.html
+# in a browser
+mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE -Dglobal.host=localhost
+----

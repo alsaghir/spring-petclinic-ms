@@ -31,7 +31,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -146,7 +145,7 @@ class VerifyAllTest {
   }
 
   @Test
-  void whenBrowserRequestOwners_ThenElementsRenderedSuccessfully() throws InterruptedException {
+  void whenBrowserRequestOwners_ThenElementsRenderedSuccessfully() {
     // Given
     page.navigate("http://" + gatewayHost + ":" + gatewayPort + "/#/owners");
 
@@ -188,7 +187,6 @@ class VerifyAllTest {
   }
 
   @Test
-  @Disabled
   void whenCallDiscoverServerAppsApi_ThenSuccessResponse() {
     // Given
     WebTestClient webTestClient = WebTestClient.bindToServer()
@@ -215,7 +213,6 @@ class VerifyAllTest {
   }
 
   @Test
-  @Disabled
   void whenCallAdminServerInstancesApi_ThenSuccessResponse() {
     // Given
     WebTestClient webTestClient = WebTestClient.bindToServer()

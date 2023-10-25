@@ -69,6 +69,8 @@ services:
       - ./docker/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
 
+ # Manipulate some runtime configurations
+  # Give permission to volume for correct user to write to logs files
   initialize-logs:
     image: busybox
     command: sh -c 'touch /var/log/services/.initialized && chown -R 10000:10001 /var/log/services'
@@ -78,6 +80,8 @@ services:
       - MyBridgeNetwork
 
   config-server:
+    image: spring-petclinic-config-server
+    pull_policy: never
     build:
       context: .
       dockerfile: ./docker/spring-boot/Dockerfile
@@ -112,8 +116,7 @@ services:
       - CONFIG_SERVER_URL=http://config-server:7771/
     depends_on:
       config-server:
-        condition:
-          service_healthy
+        condition: service_healthy
     networks:
       - MyBridgeNetwork
     healthcheck:
@@ -176,6 +179,35 @@ services:
     healthcheck:
       test: "exit 0"
       start_period: 10s
+  visits-service:
+    build:
+      context: .
+      dockerfile: ./docker/spring-boot/Dockerfile
+      args:
+        SERVICE_NAME: spring-petclinic-visits-service
+    container_name: visits-service
+    ports:
+      - "7775:7775"
+    volumes:
+      - logVolume:/workspace/app/log
+    environment:
+      - CONFIG_SERVER_URL=http://config-server:7771/
+      - H2HOST=h2-server
+      - H2PORT=1521
+      - DISCOVERY_SERVER_HOST=discovery-server
+      - ZIPKIN_URL=http://zipkin-server:9411/api/v2/spans
+      - SPRING_PROFILES_ACTIVE=default,h2
+    depends_on:
+      discovery-server:
+          condition:
+            service_healthy
+      h2-server:
+        condition: service_started
+    networks:
+      - MyBridgeNetwork
+    healthcheck:
+      test: "exit 0"
+      start_period: 10s
 
   api-gateway:
     build:
@@ -203,53 +235,10 @@ services:
       test: "exit 0"
       start_period: 10s
 
-  test:
-    image: maven:3-eclipse-temurin-17-alpine
-    container_name: test
-    command: /bin/sh -c 'cd /opt/app && mvn -pl spring-petclinic-test-service clean verify site -Dmaven.plugin.validation=VERBOSE'
-    volumes:
-      - ./:/opt/app
-      - m2:/root/.m2
-    environment:
-      - BROWSER_HOST=firefox
-    depends_on:
-      api-gateway:
-        condition:
-          service_healthy
-      customers-service:
-        condition:
-          service_healthy
-      admin-server:
-        condition:
-          service_healthy
-      discovery-server:
-        condition:
-          service_healthy
-      config-server:
-        condition:
-          service_healthy
-      firefox:
-        condition:
-          service_healthy
-    networks:
-      - MyBridgeNetwork
-
-  firefox:
-    image: selenium/standalone-firefox:latest
-    container_name: firefox
-    ports:
-      - "4444:4444"
-      - "7900:7900"
-    shm_size: 2g
-    networks:
-      - MyBridgeNetwork
-    healthcheck:
-      test: "exit 0"
-      start_period: 10s
-
 networks:
   MyBridgeNetwork:
     driver: bridge
+    enable_ipv6: false
 
 volumes:
   h2-data:
