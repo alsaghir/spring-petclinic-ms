@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public interface VisitRepository extends JpaRepository<Visit, Integer> {
+public interface VisitRepository extends JpaRepository<Visit, Long> {
 
     List<Visit> findByPetId(int petId);
 

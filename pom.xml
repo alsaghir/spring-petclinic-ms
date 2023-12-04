@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -32,7 +32,7 @@
         <java.version>17</java.version>
         <parent.version>${project.version}</parent.version>
 
-        <spring-cloud.version>2022.0.2</spring-cloud.version>
+        <spring-cloud.version>2022.0.4</spring-cloud.version>
 
         <jooq.version>3.17.8</jooq.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
@@ -41,7 +41,7 @@
         <problem-spring-web-starter.version>0.29.1</problem-spring-web-starter.version>
         <flyway-maven-plugin.version>9.16.1</flyway-maven-plugin.version>
         <spring-boot-admin.version>3.0.4</spring-boot-admin.version>
-        <micrometer.version>1.11.1</micrometer.version>
+        <micrometer.version>1.12.0</micrometer.version>
         <logstash-logback-encoder.version>7.3</logstash-logback-encoder.version>
         <selenium-java.version>4.10.0</selenium-java.version>
         <playwright.version>1.36.0</playwright.version>
@@ -92,6 +92,26 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source-generated</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/target/generated-sources</source>
+                                <source>${basedir}/target/generated-sources/annotations</source>
+                                <source>${basedir}/target/generated-sources/jooq</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

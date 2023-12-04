@@ -1,4 +1,9 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
+    "java.test.config": {
+        "name": "VerifyAll",
+        "vmArgs": ["-Dglobal.host=localhost"],
+        "env": {}
+    },
     "java.configuration.updateBuildConfiguration": "interactive"
 }

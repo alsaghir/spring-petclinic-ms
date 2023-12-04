@@ -19,8 +19,10 @@
               resultproperty="serialNumber"
               failonerror="true">
             <arg line="-Command flutter build web"/>
-            <echo level="info" message="Flutter app build on Windows is successful"/>
         </exec>
+
+        <echo if:true="${isWindows}" level="info" message="Flutter app build on Windows is successful"/>
+
 
         <exec if:true="${isUnix}"
               dir="${src.location}"
@@ -30,7 +32,7 @@
             <arg line="-c"/>
             <arg line="'flutter clean; flutter build web'"/>
         </exec>
-        <echo level="info" message="Flutter app build on *nix is successful"/>
+        <echo if:true="${isUnix}" level="info" message="Flutter app build on *nix is successful"/>
     </target>
 
     <target name="copy-flutter-output">

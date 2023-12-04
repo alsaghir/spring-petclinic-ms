@@ -21,6 +21,7 @@ import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
@@ -153,16 +154,12 @@ class VerifyAllTest {
     var rootElement = page.locator("flt-glass-pane");
     rootElement.waitFor(new WaitForOptions().setState(WaitForSelectorState.ATTACHED));
     PlaywrightAssertions.assertThat(rootElement).isEnabled();
-    /* In case html web renderer used
+    
     var cityText = rootElement.locator("flt-span:has-text('City')").first();
-    cityText.waitFor(new WaitForOptions().setTimeout(Duration.ofSeconds(5).toMillis()));
-    cityText.waitFor(new WaitForOptions().setState(WaitForSelectorState.ATTACHED));
-    cityText.waitFor(new WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    cityText.waitFor(new WaitForOptions().setState(WaitForSelectorState.HIDDEN).setTimeout(Duration.ofSeconds(5).toMillis()));
 
     // Then
-    PlaywrightAssertions.assertThat(cityText).isAttached();
-    PlaywrightAssertions.assertThat(cityText).isEnabled();
-    PlaywrightAssertions.assertThat(cityText).isVisible();*/
+    PlaywrightAssertions.assertThat(cityText).isHidden();
     assertEquals("Pet Clinic App", page.title());
   }
 
