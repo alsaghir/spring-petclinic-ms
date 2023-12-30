@@ -1,0 +1,12 @@
+include::{snippets}/createOwner/curl-request.adoc[]
+include::{snippets}/createOwner/http-request.adoc[]
+include::{snippets}/createOwner/http-response.adoc[]
+include::{snippets}/createOwner/httpie-request.adoc[]
+include::{snippets}/createOwner/request-body.adoc[]
+include::{snippets}/createOwner/response-body.adoc[]
+
+include::{snippets}/getOwners/curl-request.adoc[]
+include::{snippets}/getOwners/http-request.adoc[]
+include::{snippets}/getOwners/http-response.adoc[]
+include::{snippets}/getOwners/httpie-request.adoc[]
+include::{snippets}/getOwners/response-body.adoc[]

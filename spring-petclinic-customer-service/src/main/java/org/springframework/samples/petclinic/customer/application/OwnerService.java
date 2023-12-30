@@ -2,6 +2,8 @@ package org.springframework.samples.petclinic.customer.application;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.customer.application.command.OwnerCommand;
@@ -12,9 +14,6 @@ import org.springframework.samples.petclinic.customer.domain.OwnerRepository;
 import org.springframework.samples.petclinic.customer.domain.shared.DomainError;
 import org.springframework.samples.petclinic.customer.domain.shared.DomainException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service

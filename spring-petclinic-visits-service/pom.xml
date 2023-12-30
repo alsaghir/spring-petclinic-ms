@@ -125,7 +125,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>${flyway-maven-plugin.version}</version>
+                <version>${flyway.version}</version>
 
                 <!-- Note that we're executing the Flyway plugin in the "generate-sources" phase -->
                 <executions>

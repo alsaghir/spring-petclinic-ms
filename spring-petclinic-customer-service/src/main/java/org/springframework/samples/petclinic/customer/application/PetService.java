@@ -32,7 +32,7 @@ public class PetService {
     private final PetMapper petMapper;
 
     public List<PetTypeData> getPetTypes(int page, int size) {
-        return petTypeMapper.toData(context
+        return petTypeMapper.recordsToData(context
                 .selectFrom(PetType.PET_TYPE)
                 .offset(page)
                 .limit(size)
@@ -41,7 +41,7 @@ public class PetService {
 
 
     public List<PetTypeData> findPetTypes() {
-        return petTypeMapper.toData(context
+        return petTypeMapper.recordsToData(context
                 .selectFrom(PetType.PET_TYPE)
                 .fetch());
     }

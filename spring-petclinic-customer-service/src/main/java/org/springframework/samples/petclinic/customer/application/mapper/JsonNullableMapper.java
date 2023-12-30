@@ -4,7 +4,7 @@ import org.mapstruct.Condition;
 import org.mapstruct.Mapper;
 import org.openapitools.jackson.nullable.JsonNullable;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface JsonNullableMapper {
 
     default <T> JsonNullable<T> wrap(T entity) {

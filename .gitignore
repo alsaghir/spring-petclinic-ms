@@ -1,6 +1,5 @@
 # Local database files
 *.db
-tmp.md
 
 # Logs
 *.log

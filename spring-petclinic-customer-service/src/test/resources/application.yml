@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    discovery:
+      enabled: false
+    config:
+      enabled: false
+      discovery:
+        enabled: false
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    embedded-database-connection: h2
+    url:  jdbc:h2:mem:test;INIT=CREATE SCHEMA IF NOT EXISTS CUSTOMERS_SCHEMA\;SET SCHEMA CUSTOMERS_SCHEMA
+  flyway:
+    baseline-on-migrate: true
+  jpa:
+    open-in-view: false

@@ -59,6 +59,7 @@ public class Owner {
     @Digits(fraction = 0, integer = 12)
     private String telephone;
 
+    @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "owner")
     private Set<Pet> pets = new HashSet<>();
 

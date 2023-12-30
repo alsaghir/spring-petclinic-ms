@@ -12,7 +12,6 @@ import org.springframework.samples.petclinic.customer.domain.Owner;
 import java.util.List;
 
 @Mapper(uses = {JsonNullableMapper.class, PetMapper.class},
-        componentModel = "spring",
         nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface OwnerMapper {

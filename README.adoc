@@ -27,48 +27,46 @@ This is distributed version of the Spring Pet Clinic Sample app built with Sprin
 * Grafana
 * Flutter Web
 * H2 SQL Database
-
-== Status & Progress
-
-As this is still work in progress, there are multiple stages to be done for a complete demonstration.
-
-* TODO
-  ** python script for command line interacting  
-  ** Add custom labels and tags to prometheus and loki usage
-  ** Data initialization for vets and visits services
-  ** Vets and error front-end implementation
-  ** Include chaos (not final)
-  ** Unit tests
-  ** CI/CD Tool  (not final)
-  ** Default data
-  ** Spring security
-  ** Keycloak
-  ** Unit test
-  ** Ui end-to-end test
-  ** Code optimization
-  ** Modularity support
-  ** Jlink or artifact and runtime optimization and graalvm
-  ** Java 21 and version upgrade
-  ** Unified files as source of commands to start commands without typing and test on Windows & MacOS
-  ** e2e testing from separated docker container
-* Done
-  ** [line-through]#Monitoring verification#
-  ** [line-through]#Docker Compose#
-  ** [line-through]#Architecture doc#
-  ** [line-through]#Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)#
-  ** [line-through]#Commands for starting services locally using docker desktop with docker being target platform#
-* All services to be up and running locally with default configuration
-  ** [line-through]#Make sure JOOQ generation of classes done automatically#
-  ** [line-through]#Generate external config for Observability and tracing for plug & play#
-  ** [line-through]#Validate functionality of Grafana#
-  ** Custom Labels in Grafana for prometheus and loki
-* [line-through]#Create separate module for testing all the up and running service automating that everything is up and running as expected#
-* [line-through]#All services to be up and running locally#
-* [line-through]#All services to be up and running using docker with and without local SDK#
+* Playwright for E2E testing
 
 == Architecture
 
 image::./doc/Architecture.png[]
+
+* http://www.h2database.com/html/tutorial.html[H2] database is used for storing data via https://github.com/oscarfonts/docker-h2[`oscarfonts/h2`] docker image.
+* Zipkin
+* https://github.com/codecentric/spring-boot-admin[spring-petclinic-admin-server]
+ ** Admin UI for services health and activity.
+* https://docs.spring.io/spring-cloud-gateway/reference/index.html[spring-petclinic-api-gateway]
+ ** API gateway for all backend services. Front-End also included in this module.
+* https://docs.spring.io/spring-cloud-config/docs/current/reference/html[spring-petclinic-config-server]
+ ** Configs are centralized in single module at separate git repository that cloud be referenced locally. Should be started first.
+* https://cloud.spring.io/spring-cloud-netflix/reference/html/[spring-petclinic-discovery-server]
+ ** Spring cloud netflix used for service discovery as centralized point for all other services. Should be started second after `spring-petclinic-config-server`
+* spring-petclinic-customer-service - Restful APIs
+* spring-petclinic-vets-service - Restful APIs
+* spring-petclinic-visits-service - Restful APIs
+* spring-petclinic-test-service - With everything up and running, this test module responsible for validating that everything is OK in automated way.
+
+== Start services using docker
+
+=== Prerequisites
+
+* Docker >= 24.0.2
+
+=== Compose
+
+[source,bash]
+----
+# Build the images
+docker compose -f docker-compose.yml build
+
+# Run all
+docker compose -f docker-compose.yml up
+
+# Shutdown and remove resources
+docker compose -f docker-compose.yml down
+----
 
 == Start services locally
 
@@ -105,18 +103,6 @@ mvn -pl spring-petclinic-admin-server clean spring-boot:run
 mvn -pl spring-petclinic-api-gateway clean spring-boot:run
 mvn -pl spring-petclinic-customer-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2"
 mvn -pl spring-petclinic-visits-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2"
-
-# Install browser to be used for testing
-# For Windows PowerShell it is
-# $env:PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -pl spring-petclinic-test-service -D exec.args="install firefox"
-
-# Validate everything is working correctly by running
-# the test service and open spring-petclinic-test-service/target/site/index.html
-# in a browser
-mvn -pl spring-petclinic-test-service clean verify site -D maven.plugin.validation=VERBOSE -D global.host=localhost
-
 ----
 
 * Services locations
@@ -128,7 +114,7 @@ mvn -pl spring-petclinic-test-service clean verify site -D maven.plugin.validati
 | Discovery Server  | http://localhost:7772
 | Config Server  | http://localhost:7771
 | Flutter Web UI & API Gateway  | http://localhost:7778
-| Customers | http://localhost:7773
+| Customers | http://localhost:7773 - http://localhost:7773/docs/api.html[API Docs] - http://localhost:7773/swagger-ui.html[Swagger UI] - http://localhost:7773/v3/api-docs.yaml[OpenAPI Specs]
 | Vets | http://localhost:7774
 | Visits | http://localhost:7775
 | Tracing Server (Zipkin) | http://localhost:9411/zipkin/ (we use openzipkin)
@@ -137,26 +123,6 @@ mvn -pl spring-petclinic-test-service clean verify site -D maven.plugin.validati
 | Prometheus | http://localhost:9090
 | Loki | http://localhost:3100/metrics
 |===
-
-== Start services using docker
-
-=== Prerequisites
-
-* Docker >= 24.0.2
-
-=== Compose
-
-[source,bash]
-----
-# Build the images
-docker compose -f docker-compose.yml build
-
-# Run all
-docker compose -f docker-compose.yml up
-
-# Shutdown and remove resources
-docker compose -f docker-compose.yml down
-----
 
 == Plus
 
@@ -185,3 +151,44 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -pl spring-petcl
 # in a browser
 mvn -pl spring-petclinic-test-service clean verify site -D maven.plugin.validation=VERBOSE -D global.host=localhost
 ----
+
+=== Development
+
+* Dependencies & Editors
+** VSCode. Configurations for `Microsodt Visual Studio Code` for running and debugging all services available in `.vscode` for `Windows OS`. Note that docker dependent services should be up and running first.
+
+== Status & Progress
+
+As this is still work in progress, there are multiple stages to be done for a complete demonstration.
+
+* TODO
+** [line-through]#ArchUnit#
+** [line-through]#Ui end-to-end test#
+** Add custom labels and tags to prometheus and loki usage
+** Data initialization for vets and visits services
+** Vets and error front-end implementation
+** [line-through]#Modularity support#
+** https://medium.com/azulsystems/using-jlink-to-build-java-runtimes-for-non-modular-applications-9568c5e70ef4[Jlink or artifact and runtime optimization and graalvm]
+** Include chaos (not final)
+** [line-through]#Unit tests#
+** CI/CD Tool  (not final)
+** Default data
+** Spring security
+** Keycloak
+** Code optimization
+** Java 21 and version upgrade
+** e2e testing from separated docker container
+* Done
+** [line-through]#Monitoring verification#
+** [line-through]#Docker Compose#
+** [line-through]#Architecture doc#
+** [line-through]#Commands for starting services locally using SDKs and docker desktop (i.e. in Intellij IDE)#
+** [line-through]#Commands for starting services locally using docker desktop with docker being target platform#
+* All services to be up and running locally with default configuration
+** [line-through]#Make sure JOOQ generation of classes done automatically#
+** [line-through]#Generate external config for Observability and tracing for plug & play#
+** [line-through]#Validate functionality of Grafana#
+** Custom Labels in Grafana for prometheus and loki
+* [line-through]#Create separate module for testing all the up and running service automating that everything is up and running as expected#
+* [line-through]#All services to be up and running locally#
+* [line-through]#All services to be up and running using docker with and without local SDK#

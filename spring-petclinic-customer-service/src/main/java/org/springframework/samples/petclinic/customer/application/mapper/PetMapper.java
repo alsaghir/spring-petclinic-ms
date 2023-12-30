@@ -10,7 +10,7 @@ import org.springframework.samples.petclinic.customer.domain.Owner;
 import org.springframework.samples.petclinic.customer.domain.Pet;
 import org.springframework.samples.petclinic.customer.domain.PetType;
 
-@Mapper(componentModel = "spring", nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
+@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface PetMapper {
 
     @Mapping(source = "owner", target = "ownerName", qualifiedByName = "assembleOwnerName")
