@@ -69,7 +69,7 @@ services:
       - ./docker/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
 
- # Manipulate some runtime configurations
+  # Manipulate some runtime configurations
   # Give permission to volume for correct user to write to logs files
   initialize-logs:
     image: busybox

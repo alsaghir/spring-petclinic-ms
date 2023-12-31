@@ -43,4 +43,4 @@ COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/dependencies/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/spring-boot-loader/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/snapshot-dependencies/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/application/ ./
-ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

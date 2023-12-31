@@ -1,5 +1,5 @@
 # Global Args
-ARG JDK_VERSION=17.0.7
+ARG JDK_VERSION=17.0.9
 ARG WORKDIR_APP=/workspace/app
 ARG EXTRACTED=${WORKDIR_APP}/target/extracted
 
@@ -57,11 +57,13 @@ RUN apt-get update -qq && apt-get install -qq -y --no-install-recommends \
     && apt-get clean
 
 # Clone the flutter repo
+# Add "flutter upgrade" for updating cached flutter
 RUN --mount=type=cache,target=/usr/local/flutter git -C /usr/local/flutter pull || git clone https://github.com/flutter/flutter.git /usr/local/flutter \
     && ls -lah /usr/local/ \
     && flutter config --no-analytics --enable-web --no-enable-android --no-enable-ios \
+    && flutter channel stable \
+    && flutter upgrade \
     && flutter doctor -v \
-    && flutter channel master  \
     # Enable flutter web
     && flutter pub global activate webdev \
     # Cache Web SDK
@@ -111,4 +113,4 @@ COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/spring-boot-load
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/snapshot-dependencies/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/application/ ./
 
-ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

@@ -61,10 +61,6 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
-                        <exclude>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct</artifactId>
-                        </exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -78,6 +74,11 @@
                     <generatedSourcesDirectory>${project.build.directory}/generated-sources</generatedSourcesDirectory>
                     <annotationProcessorPaths>
                         <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
@@ -88,9 +89,9 @@
                             <version>${lombok-mapstruct-binding.version}</version>
                         </path>
                         <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>3.2.1</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -110,6 +111,7 @@
                                 <source>${basedir}/target/generated-sources</source>
                                 <source>${basedir}/target/generated-sources/annotations</source>
                                 <source>${basedir}/target/generated-sources/jooq</source>
+                                <source>${basedir}/target/generated-sources/mapstruct</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -199,8 +201,7 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+             <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
