@@ -53,19 +53,24 @@ image::./doc/Architecture.png[]
 === Prerequisites
 
 * Docker >= 24.0.2
+* JDK 17, Maven & Flutter SDK are required. Not required for building inside docker but note that building using docker without SDKs requires a lot of RAM usage.
 
 === Compose
 
 [source,bash]
 ----
+# Compile and build everything locally
+mvn clean package
+
 # Build the images
-docker compose -f docker-compose.yml build
+# Use docker-compose.yml for building everything inside docker (high RAM usage)
+docker compose -f docker-compose-nosdk.yml build
 
 # Run all
-docker compose -f docker-compose.yml up
+docker compose -f docker-compose-nosdk.yml up
 
 # Shutdown and remove resources
-docker compose -f docker-compose.yml down
+docker compose -f docker-compose-nosdk.yml down
 ----
 
 == Start services locally
