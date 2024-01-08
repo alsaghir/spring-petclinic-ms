@@ -60,7 +60,8 @@ image::./doc/Architecture.png[]
 [source,bash]
 ----
 # Compile and build everything locally
-mvn clean package
+# Excluding E2E test module
+mvn clean package -pl !spring-petclinic-test-service
 
 # Build the images
 # Use docker-compose.yml for building everything inside docker (high RAM usage)
