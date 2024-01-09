@@ -103,12 +103,12 @@ docker container run -d --name prometheus-server --network MyBridgeNetwork -p 90
 docker container run -d --name=grafana-server --network MyBridgeNetwork -p 3000:3000 -v  ${PWD}/docker/grafana/provisioning:/etc/grafana/provisioning -v  ${PWD}/docker/grafana/grafana.ini:/etc/grafana/grafana.ini -v  ${PWD}/docker/grafana/dashboards:/var/lib/grafana/dashboards grafana/grafana-oss
 
 # Run Spring boot apps
-mvn -pl spring-petclinic-config-server clean spring-boot:run -"Dspring-boot.run.profiles=native" -"Dspring-boot.run.arguments=--config.file-repo=/Users/elsagheera/Desktop/code/other/spring-petclinic-ms-config/"
-mvn -pl spring-petclinic-discovery-server clean spring-boot:run
-mvn -pl spring-petclinic-admin-server clean spring-boot:run
-mvn -pl spring-petclinic-api-gateway clean spring-boot:run
-mvn -pl spring-petclinic-customer-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2"
-mvn -pl spring-petclinic-visits-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2"
+mvn -pl spring-petclinic-config-server clean spring-boot:run -"Dspring-boot.run.profiles=native" -"Dspring-boot.run.arguments=--config.file-repo=/Users/elsagheera/Desktop/code/other/spring-petclinic-ms-config/" -D spring-boot.run.jvmArguments="-Xmx128m"
+mvn -pl spring-petclinic-discovery-server clean spring-boot:run -D spring-boot.run.jvmArguments="-Xmx128m"
+mvn -pl spring-petclinic-admin-server clean spring-boot:run -D spring-boot.run.jvmArguments="-Xmx128m"
+mvn -pl spring-petclinic-api-gateway clean spring-boot:run -D spring-boot.run.jvmArguments="-Xmx128m"
+mvn -pl spring-petclinic-customer-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2" -D spring-boot.run.jvmArguments="-Xmx128m"
+mvn -pl spring-petclinic-visits-service clean spring-boot:run -"Dspring-boot.run.profiles=default,h2" -D spring-boot.run.jvmArguments="-Xmx128m"
 ----
 
 * Services locations

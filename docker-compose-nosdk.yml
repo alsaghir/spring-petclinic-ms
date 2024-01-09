@@ -4,6 +4,10 @@ services:
   h2-server:
     image: oscarfonts/h2
     container_name: h2-server
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     networks:
       - MyBridgeNetwork
     ports:
@@ -17,6 +21,10 @@ services:
   zipkin-server:
     image: openzipkin/zipkin
     container_name: zipkin-server
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     networks:
       - MyBridgeNetwork
     ports:
@@ -25,6 +33,10 @@ services:
   promtail-server:
     image: grafana/promtail:2.8.0
     container_name: promtail-server
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     command: --config.file=/mnt/config/promtail-config.yaml
     networks:
       - MyBridgeNetwork
@@ -39,6 +51,10 @@ services:
   loki-server:
     image: grafana/loki:2.8.0
     container_name: loki-server
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     command: --config.file=/mnt/config/loki-config.yaml
     networks:
       - MyBridgeNetwork
@@ -50,6 +66,10 @@ services:
   prometheus-server:
     image: prom/prometheus
     container_name: prometheus-server
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     networks:
       - MyBridgeNetwork
     ports:
@@ -60,6 +80,10 @@ services:
   grafana-server:
     image: grafana/grafana-oss
     container_name: grafana-server
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     networks:
       - MyBridgeNetwork
     ports:
@@ -88,6 +112,10 @@ services:
       args:
         SERVICE_NAME: spring-petclinic-config-server
     container_name: config-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     ports:
       - "7771:7771"
       - "8001:8000"
@@ -109,6 +137,10 @@ services:
       args:
         SERVICE_NAME: spring-petclinic-discovery-server
     container_name: discovery-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     ports:
       - "7772:7772"
       - "8002:8000"
@@ -135,6 +167,10 @@ services:
       args:
         SERVICE_NAME: spring-petclinic-admin-server
     container_name: admin-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     ports:
       - "7776:7776"
       - "8003:8000"
@@ -160,6 +196,10 @@ services:
       args:
         SERVICE_NAME: spring-petclinic-customer-service
     container_name: customers-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     ports:
       - "7773:7773"
       - "8004:8000"
@@ -190,6 +230,10 @@ services:
       args:
         SERVICE_NAME: spring-petclinic-visits-service
     container_name: visits-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     ports:
       - "7775:7775"
       - "8005:8000"
@@ -221,6 +265,10 @@ services:
       args:
         SERVICE_NAME: spring-petclinic-api-gateway
     container_name: api-gateway
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     ports:
       - "7778:7778"
       - "8006:8000"

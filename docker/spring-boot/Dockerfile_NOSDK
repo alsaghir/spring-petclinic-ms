@@ -38,4 +38,5 @@ COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/dependencies/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/spring-boot-loader/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/snapshot-dependencies/ ./
 COPY --from=builder --chown=${USERNAME}:${GROUPNAME} $EXTRACTED/application/ ./
-ENTRYPOINT ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000", "org.springframework.boot.loader.launch.JarLauncher"]
+
+ENTRYPOINT java -XX:InitialRAMPercentage=30 -XX:MaxRAMPercentage=70 -XX:+UseContainerSupport -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000 org.springframework.boot.loader.launch.JarLauncher
