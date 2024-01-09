@@ -68,7 +68,7 @@ mvn clean package -pl !spring-petclinic-test-service
 docker compose -f docker-compose-nosdk.yml build
 
 # Run all
-docker compose -f docker-compose-nosdk.yml up
+docker compose -f docker-compose-nosdk.yml up --detach
 
 # Shutdown and remove resources
 docker compose -f docker-compose-nosdk.yml down
